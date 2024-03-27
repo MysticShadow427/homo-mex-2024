@@ -35,3 +35,4 @@ def save_training_history(history,path):
                             'val_loss': history['val_loss'][epoch]})
 
     print("History saved to", path)
+
