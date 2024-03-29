@@ -4,10 +4,11 @@ import csv
 
 def plot_accuracy_loss(history):
 
-    train_acc = history['train_acc']
-    train_loss = history['train_loss']
-    val_acc = history['val_acc']
-    val_loss = history['val_loss']
+    train_acc = [acc.cpu().numpy() for acc in history['train_acc']]
+    train_loss = [loss.cpu().numpy() for loss in history['train_loss']]
+    val_acc = [acc.cpu().numpy() for acc in history['val_acc']]
+    val_loss = [loss.cpu().numpy() for loss in history['val_loss']]
+
 
     plt.figure(figsize=(12, 6))
 
