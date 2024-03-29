@@ -28,7 +28,7 @@ if __name__ == "__main__":
     learning_rate = args.learning_rate
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print('Device : ',device)
+    print('\033[91m' + 'Device : ',device + '\033[0m')
     print()
 
     df = pd.read_csv('/content/homo-mex-2024/data/public_data_dev_phase/track_1_dev.csv')
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     val_df = pd.DataFrame({'content': X_val, 'label': y_val})
     
     # test_df = pd.read_csv('/content/homo-mex-2024/data/public_data_test_phase/track_1_test.csv')
-    print('Loaded Training, validation and test dataframes')
+    print('\033[91m' + 'Loaded Training, validation and test dataframes'+ '\033[0m')
     print()
 
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     # test_df['content'] = test_df['content'].apply(remove_chars_except_punctuations)
     # test_df['content'] = test_df['content'].apply(remove_newline_pattern)
 
-    print('Preprocessing of Data done')
+    print('\033[91m' + 'Preprocessing of Data done'+ '\033[0m')
     print()
 
     # Label to index
@@ -70,16 +70,16 @@ if __name__ == "__main__":
     checkpoint = 'dccuchile/bert-base-spanish-wwm-uncased'
 
     tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-    print('Tokenizer Loaded')
+    print('\033[91m' + 'Tokenizer Loaded'+ '\033[0m')
     print()
     model = MexSpanClassifier(n_classes=3).to(device)
-    print('Model Spanish BERT Loaded')
+    print('\033[91m' + 'Model Spanish BERT Loaded'+ '\033[0m')
     print()
 
     train_data_loader = create_data_loader(train_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
     val_data_loader = create_data_loader(val_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
     # test_data_loader = create_data_loader(test_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
-    print('Dataloaders created')
+    print('\033[91m' + 'Dataloaders created')
     print()
 
     total_steps = len(train_data_loader) * EPOCHS
@@ -91,17 +91,17 @@ if __name__ == "__main__":
                 num_warmup_steps=0,
                 num_training_steps=total_steps
                 )
-    print('Loss function,Optimizer and Learning Rate Schedule set')
+    print('\033[91m' + 'Loss function,Optimizer and Learning Rate Schedule set'+ '\033[0m')
     print()
 
     history = defaultdict(list)
     best_acc = 0
-    print('Starting training...')
+    print('\033[91m' + 'Starting training...'+ '\033[0m')
     print()
 
     for epoch in range(EPOCHS):
-        print(f'Epoch {epoch + 1}/{EPOCHS}')
-        print('-' * 10)
+        print('\033[91m' + f'Epoch {epoch + 1}/{EPOCHS}'+ '\033[0m')
+        print('\033[91m' + '-' * 10+ '\033[0m')
 
         train_acc, train_loss = train_epoch(
             model,
@@ -113,7 +113,7 @@ if __name__ == "__main__":
             len(train_df)
         )
 
-        print(f'Train loss {train_loss} accuracy {train_acc}')
+        print('\033[91m' + f'Train loss {train_loss} accuracy {train_acc}'+ '\033[0m')
 
         val_acc, val_loss = eval_model(
             model,
@@ -123,7 +123,7 @@ if __name__ == "__main__":
             len(val_df)
         )
 
-        print(f'Val   loss {val_loss} accuracy {val_acc}')
+        print('\033[91m' + f'Val   loss {val_loss} accuracy {val_acc}'+ '\033[0m')
         print()
 
         history['train_acc'].append(train_acc)
@@ -136,7 +136,7 @@ if __name__ == "__main__":
             torch.save(obj=model.state_dict(),f='/content/homo-mex-2024/artifacts/best_model_full_fine_tune.pth')
             best_acc = val_acc
     print()
-    print('Training finished')
+    print('\033[91m' + 'Training finished'+ '\033[0m')
     print()
 
     plot_accuracy(history)
@@ -144,7 +144,7 @@ if __name__ == "__main__":
 
     history_csv_file_path = "/content/homo-mex-2024/artifacts/history.csv"
     save_training_history(history=history,path=history_csv_file_path)
-    print('Training History saved')
+    print('\033[91m' + 'Training History saved'+ '\033[0m')
     print()
     # test_acc, _ = eval_model(
     #     model,
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     # print('Test Accuracy',test_acc.item())
     # print()
 
-    print('Getting Predictions...')
+    print('\033[91m' + 'Getting Predictions...'+ '\033[0m')
     print()
     # y_review_texts_test, y_pred_test, y_pred_probs_test, y_test = get_predictions(model,test_data_loader)
     y_review_texts_val, y_pred_val, y_pred_probs_val, y_val = get_predictions(model,val_data_loader)
@@ -168,12 +168,12 @@ if __name__ == "__main__":
     # get_classification_report(y_test,y_pred_test)
     # get_scores(y_test,y_pred_test)
     # get_confusion_matrix(y_test,y_pred_test)
-    print('Val Data Classification Report : ')
+    print('\033[91m' + 'Val Data Classification Report : '+ '\033[0m')
     print()
     get_classification_report(y_val,y_pred_val)
     get_scores(y_val,y_pred_val)
     get_confusion_matrix(y_val,y_pred_val)
-    print('Train Data Classification Report : ')
+    print('\033[91m' + 'Train Data Classification Report : '+ '\033[0m')
     print()
     get_classification_report(y_train,y_pred_train)
     get_scores(y_train,y_pred_train)
