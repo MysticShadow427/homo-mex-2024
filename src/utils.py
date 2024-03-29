@@ -3,8 +3,8 @@ import seaborn as sns
 import csv
 
 def plot_accuracy(history):
-    plt.plot(history['train_acc'], label='train accuracy')
-    plt.plot(history['val_acc'], label='validation accuracy')
+    plt.plot(history['train_acc'].cpu().numpy() , label='train accuracy')
+    plt.plot(history['val_acc'].cpu().numpy() , label='validation accuracy')
 
     plt.title('Training history')
     plt.ylabel('Accuracy')
@@ -13,8 +13,8 @@ def plot_accuracy(history):
     plt.ylim([0, 1]);
 
 def plot_loss(history):
-    plt.plot(history['train_loss'], label='train loss')
-    plt.plot(history['val_loss'], label='validation loss')
+    plt.plot(history['train_loss'].cpu().numpy() , label='train loss')
+    plt.plot(history['val_loss'].cpu().numpy() , label='validation loss')
 
     plt.title('Training history')
     plt.ylabel('Loss')
