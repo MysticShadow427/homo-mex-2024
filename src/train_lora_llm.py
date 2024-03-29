@@ -56,7 +56,7 @@ model = AutoModelForSequenceClassification.from_pretrained(base_model, id2label=
 print('\033[96m' + 'Loaded pretrained spanish BERT'+ '\033[0m')
 print()
 
-peft_config = LoraConfig(task_type="SEQ_CLS", inference_mode=False, r=8, lora_alpha=16, lora_dropout=0.1)#target_modules = )
+peft_config = LoraConfig(task_type="SEQ_CLS", inference_mode=False, r=8, lora_alpha=16, lora_dropout=0.1,target_modules = ['layer.attention.self.query','layer.attention.self.key','layer.attention.self.value','layer.attention.output.dense'])
 peft_model = get_peft_model(model, peft_config)
 
 print('PEFT Model')
