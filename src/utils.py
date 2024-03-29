@@ -1,13 +1,19 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import csv
+import torch 
 
 def plot_accuracy_loss(history):
 
+    for key in history:
+        history[key] = [torch.tensor(value) if not isinstance(value, torch.Tensor) else value for value in history[key]]
+
+# Extracting data from history
     train_acc = [acc.cpu().numpy() for acc in history['train_acc']]
     train_loss = [loss.cpu().numpy() for loss in history['train_loss']]
     val_acc = [acc.cpu().numpy() for acc in history['val_acc']]
     val_loss = [loss.cpu().numpy() for loss in history['val_loss']]
+
 
 
     plt.figure(figsize=(12, 6))

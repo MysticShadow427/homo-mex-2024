@@ -50,18 +50,20 @@ def get_classification_report(y_test, y_pred):
 
 def get_confusion_matrix(y_test, y_pred):
   cm = confusion_matrix(y_test, y_pred)
+  print('\033[96m' + 'Confusion Matrix : \n'+'\033[0m',cm)
   df_cm = pd.DataFrame(cm, index=class_names, columns=class_names)
   hmap = sns.heatmap(df_cm, annot=True, fmt="d", cmap="Blues")
   hmap.yaxis.set_ticklabels(hmap.yaxis.get_ticklabels(), rotation=0, ha='right')
   hmap.xaxis.set_ticklabels(hmap.xaxis.get_ticklabels(), rotation=30, ha='right')
   plt.ylabel('True Labels')
-  plt.xlabel('Predicted Labels');
+  plt.xlabel('Predicted Labels')
+  plt.show()
 
 def get_scores(y_test,y_pred):
     print('Accuracy : ',accuracy_score(y_test,y_pred))
     print()
-    print('Precision : ',precision_score(y_test,y_pred))
+    print('Precision : ',precision_score(y_test,y_pred,average='weighted'))
     print()
-    print('Recall : ',recall_score(y_test,y_pred))
+    print('Recall : ',recall_score(y_test,y_pred,average='weighted'))
     print()
-    print('F-1 : ',f1_score(y_test,y_pred))
+    print('F-1 : ',f1_score(y_test,y_pred,average='weighted'))
