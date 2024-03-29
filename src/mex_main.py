@@ -10,6 +10,7 @@ import torch.nn as nn
 import pandas as pd
 import numpy as np
 import csv
+from sklearn.model_selection import train_test_split
 from mex_preprocess import remove_chars_except_punctuations,remove_newline_pattern,remove_numbers_and_urls,remove_pattern
 from mex_eval import get_confusion_matrix,get_predictions,get_scores,get_classification_report
 from load_lora_llm import MexSpanClassifierLoRA
@@ -30,26 +31,23 @@ if __name__ == "__main__":
     print('Device : ',device)
     print()
 
-    train_df = pd.read_csv('/content/homo-mex-2024/data/public_data_train_phase/track_1_train.csv')
-    val_df = pd.read_csv('/content/homo-mex-2024/data/public_data_dev_phase/track_1_dev.csv')
-    test_df = pd.read_csv('/content/homo-mex-2024/data/public_data_test_phase/track_1_test.csv')
+    df = pd.read_csv('/content/homo-mex-2024/data/public_data_dev_phase/track_1_dev.csv')
+
+    df['content'] = df['content'].apply(remove_pattern)
+    df['content'] = df['content'].apply(remove_numbers_and_urls)
+    df['content'] = df['content'].apply(remove_chars_except_punctuations)
+    df['content'] = df['content'].apply(remove_newline_pattern)
+
+    train_df,val_df = train_test_split(df,test_size=0.2,random_state=42,stratify=True)
+    # test_df = pd.read_csv('/content/homo-mex-2024/data/public_data_test_phase/track_1_test.csv')
     print('Loaded Training, validation and test dataframes')
     print()
 
-    train_df['content'] = train_df['content'].apply(remove_pattern)
-    train_df['content'] = train_df['content'].apply(remove_numbers_and_urls)
-    train_df['content'] = train_df['content'].apply(remove_chars_except_punctuations)
-    train_df['content'] = train_df['content'].apply(remove_newline_pattern)
 
-    val_df['content'] = val_df['content'].apply(remove_pattern)
-    val_df['content'] = val_df['content'].apply(remove_numbers_and_urls)
-    val_df['content'] = val_df['content'].apply(remove_chars_except_punctuations)
-    val_df['content'] = val_df['content'].apply(remove_newline_pattern)
-
-    test_df['content'] = test_df['content'].apply(remove_pattern)
-    test_df['content'] = test_df['content'].apply(remove_numbers_and_urls)
-    test_df['content'] = test_df['content'].apply(remove_chars_except_punctuations)
-    test_df['content'] = test_df['content'].apply(remove_newline_pattern)
+    # test_df['content'] = test_df['content'].apply(remove_pattern)
+    # test_df['content'] = test_df['content'].apply(remove_numbers_and_urls)
+    # test_df['content'] = test_df['content'].apply(remove_chars_except_punctuations)
+    # test_df['content'] = test_df['content'].apply(remove_newline_pattern)
 
     print('Preprocessing of Data done')
     print()
@@ -74,7 +72,7 @@ if __name__ == "__main__":
 
     train_data_loader = create_data_loader(train_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
     val_data_loader = create_data_loader(val_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
-    test_data_loader = create_data_loader(test_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
+    # test_data_loader = create_data_loader(test_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
     print('Dataloaders created')
     print()
 
@@ -142,28 +140,28 @@ if __name__ == "__main__":
     save_training_history(history=history,path=history_csv_file_path)
     print('Training History saved')
     print()
-    test_acc, _ = eval_model(
-        model,
-        test_data_loader,
-        loss_fn,
-        device,
-        len(test_df)
-        )
+    # test_acc, _ = eval_model(
+    #     model,
+    #     test_data_loader,
+    #     loss_fn,
+    #     device,
+    #     len(test_df)
+    #     )
 
-    print('Test Accuracy',test_acc.item())
-    print()
+    # print('Test Accuracy',test_acc.item())
+    # print()
 
     print('Getting Predictions...')
     print()
-    y_review_texts_test, y_pred_test, y_pred_probs_test, y_test = get_predictions(model,test_data_loader)
+    # y_review_texts_test, y_pred_test, y_pred_probs_test, y_test = get_predictions(model,test_data_loader)
     y_review_texts_val, y_pred_val, y_pred_probs_val, y_val = get_predictions(model,val_data_loader)
     y_review_texts_train, y_pred_train, y_pred_probs_train, y_train = get_predictions(model,train_data_loader)
 
-    print('Test Data Classification Report : ')
-    print()
-    get_classification_report(y_test,y_pred_test)
-    get_scores(y_test,y_pred_test)
-    get_confusion_matrix(y_test,y_pred_test)
+    # print('Test Data Classification Report : ')
+    # print()
+    # get_classification_report(y_test,y_pred_test)
+    # get_scores(y_test,y_pred_test)
+    # get_confusion_matrix(y_test,y_pred_test)
     print('Val Data Classification Report : ')
     print()
     get_classification_report(y_val,y_pred_val)
@@ -174,5 +172,6 @@ if __name__ == "__main__":
     get_classification_report(y_train,y_pred_train)
     get_scores(y_train,y_pred_train)
     get_confusion_matrix(y_train,y_pred_train)
+    
 
 

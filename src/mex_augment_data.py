@@ -1,0 +1,1 @@
+# so we have very imbalanced data so we need to augment and best i can see is back - transalation technique 
