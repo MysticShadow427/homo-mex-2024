@@ -5,7 +5,7 @@ from peft import LoraConfig, get_peft_model
 from peft import AutoPeftModelForSequenceClassification
 from datasets import load_dataset
 from torch.utils.data import DataLoader
-from mex_eval import get_confusion_matrix,get_classification_report,get_predictions,get_scores
+from mex_eval import get_confusion_matrix,get_classification_report,get_peft_predictions,get_scores
 
 peft_model_name = 'bert-base-spanish-wwm-uncased-peft-homo-mex'
 modified_base = 'bert-base-spanish-wwm-uncased-modified-homo-mex'
@@ -37,7 +37,7 @@ training_args = TrainingArguments(
     output_dir='./results',
     evaluation_strategy='epoch',
     learning_rate=2e-5,
-    num_train_epochs=10,
+    num_train_epochs=15,
     per_device_train_batch_size=16,
 )
 print('\033[96m' + 'Training arguments set.'+ '\033[0m')
@@ -83,8 +83,8 @@ train_data_loader = DataLoader(train_dataset, batch_size=16, collate_fn=data_col
 print('\033[96m' + 'Getting Predictions...'+ '\033[0m')
 print()
 # y_review_texts_test, y_pred_test, y_pred_probs_test, y_test = get_predictions(model,test_data_loader)
-y_review_texts_val, y_pred_val, y_pred_probs_val, y_val = get_predictions(inference_model,val_data_loader)
-y_review_texts_train, y_pred_train, y_pred_probs_train, y_train = get_predictions(inference_model,train_data_loader)
+y_pred_val, y_pred_probs_val, y_val = get_peft_predictions(inference_model,val_data_loader)
+y_pred_train, y_pred_probs_train, y_train = get_peft_predictions(inference_model,train_data_loader)
 
 # print('Test Data Classification Report : ')
 # print()

@@ -52,3 +52,6 @@ def save_training_history(history,path):
 
     print("History saved to", path)
 
+def get_sentence_embeddings():
+    """Get sentence embeddings of the text dataset"""
+    pass

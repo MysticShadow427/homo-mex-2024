@@ -1,0 +1,1 @@
+# extract word embedding from bert , use some augmentation technique and train a custom transformer, we choose this path as we need augmentations and after embeddings we can have augmentations
