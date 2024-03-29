@@ -3,7 +3,7 @@ import argparse
 from mex_trainer import train_epoch,eval_model
 from mex_dataloader import create_data_loader
 from load_llm import MexSpanClassifier
-from utils import plot_accuracy,plot_loss,save_training_history
+from utils import plot_accuracy_loss,save_training_history
 from transformers import AutoModel,AutoTokenizer,AdamW,get_linear_schedule_with_warmup
 import torch
 import torch.nn as nn
@@ -139,8 +139,7 @@ if __name__ == "__main__":
     print('\033[96m' + 'Training finished'+ '\033[0m')
     print()
 
-    plot_accuracy(history)
-    plot_loss(history)
+    plot_accuracy_loss(history)
 
     history_csv_file_path = "/content/homo-mex-2024/artifacts/history.csv"
     save_training_history(history=history,path=history_csv_file_path)

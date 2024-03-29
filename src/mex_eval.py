@@ -45,8 +45,8 @@ def get_predictions(model, data_loader):
     real_values = torch.stack(real_values).cpu()
     return review_texts, predictions, prediction_probs, real_values
 
-def get_classification_report(y_test, y_pred, target_names=class_names):
-    print(classification_report(y_test, y_pred, target_names))
+def get_classification_report(y_test, y_pred):
+    print(classification_report(y_test, y_pred))
 
 def get_confusion_matrix(y_test, y_pred):
   cm = confusion_matrix(y_test, y_pred)
