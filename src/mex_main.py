@@ -37,8 +37,14 @@ if __name__ == "__main__":
     df['content'] = df['content'].apply(remove_numbers_and_urls)
     df['content'] = df['content'].apply(remove_chars_except_punctuations)
     df['content'] = df['content'].apply(remove_newline_pattern)
+    X = df['content']
+    y = df['label']
 
-    train_df,val_df = train_test_split(df,test_size=0.2,random_state=42,stratify=True)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42,stratify=True)
+
+    train_df = pd.DataFrame({'content': X_train, 'label': y_train})
+    val_df = pd.DataFrame({'content': X_val, 'label': y_val})
+    
     # test_df = pd.read_csv('/content/homo-mex-2024/data/public_data_test_phase/track_1_test.csv')
     print('Loaded Training, validation and test dataframes')
     print()
