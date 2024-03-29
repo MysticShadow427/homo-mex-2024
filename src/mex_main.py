@@ -40,7 +40,7 @@ if __name__ == "__main__":
     X = df['content']
     y = df['label']
 
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42,stratify=True)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42,stratify=y)
 
     train_df = pd.DataFrame({'content': X_train, 'label': y_train})
     val_df = pd.DataFrame({'content': X_val, 'label': y_val})
