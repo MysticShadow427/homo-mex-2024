@@ -65,3 +65,4 @@ def eval_model(model, data_loader, loss_fn, device, n_examples):
       losses.append(loss.item())
 
   return correct_predictions.double() / n_examples, np.mean(losses)
+

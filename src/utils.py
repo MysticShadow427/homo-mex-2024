@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import csv
 import torch 
+import joblib
 
 def plot_accuracy_loss(history):
 
@@ -52,6 +53,15 @@ def save_training_history(history,path):
 
     print("History saved to", path)
 
-def get_sentence_embeddings():
-    """Get sentence embeddings of the text dataset"""
-    pass
+def save_xgb(model):
+    filename = '/content/drive/MyDrive/xgb_classifier_model.pkl'
+    joblib.dump(model, filename)
+
+    print("XGBoost classifier saved successfully.")
+
+def load_xgb(path):
+    xgb_classifier = joblib.load(path)
+    print("XGBoost classifier loaded successfully.")
+    return xgb_classifier
+
+    

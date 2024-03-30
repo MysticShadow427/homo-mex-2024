@@ -39,12 +39,9 @@ def cbos_augment_embeddings():
     """Use CBOS(Cluster-based oversampling (CBOS)) on the embeddings"""
     pass
 
-def we_augment_embeddings():
-    """Use WE(Wilsons editing) on the embeddings"""
-    pass
 
 def oss_augment_embeddings():
     """Use OSS(One-sides Sections) on the embeddings"""
-    
+
 
 
