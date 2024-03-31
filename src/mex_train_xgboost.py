@@ -38,10 +38,9 @@ if __name__ == "__main__":
     else:
         df = augment_data_with_oss(df)
 
-    
-    labels_df = pd.DataFrame(df['label'].values,columns = ['label'])
     le = LabelEncoder()
     df['label'] = le.fit_transform(df['label'])
+    labels_df = pd.DataFrame(df['label'].values,columns = ['label'])
     df_ = df.drop('label',axis = 1)
     # class_names = ['NP','NR','P']
     
