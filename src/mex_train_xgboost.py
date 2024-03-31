@@ -38,19 +38,23 @@ if __name__ == "__main__":
     else:
         df = augment_data_with_oss(df)
 
-    # le = LabelEncoder()
-    # df['label'] = le.fit_transform(df['label'])
+    
     labels_df = pd.DataFrame(df['label'].values,columns = ['label'])
-    df = df.drop('label',axis = 1)
-    class_names = ['NP','NR','P']
+    le = LabelEncoder()
+    df['label'] = le.fit_transform(df['label'])
+    df_ = df.drop('label',axis = 1)
+    # class_names = ['NP','NR','P']
+    
 
-    X_train,X_test,y_train,y_test = train_test_split(df,labels_df,test_size = 0.20,random_state = 42,stratify=labels_df)
+    X_train,X_test,y_train,y_test = train_test_split(df_,labels_df,test_size = 0.20,random_state = 42,stratify=labels_df)
     
     classes_weights = class_weight.compute_sample_weight(class_weight='balanced',y=y_train['label'])
 
-    print('\033[96m' + X_train.shape,X_test.shape+ '\033[0m')
+    # print('\033[96m' + X_train.shape+ '\033[0m')
+    # print('\033[96m' + X_test.shape+ '\033[0m')
 
     if tune:
+    
         print('\033[96m' + 'Hyperparameter Tuning...'+ '\033[0m')
         def objective(trial):
             """Define the objective function"""
