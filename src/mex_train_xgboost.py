@@ -5,19 +5,38 @@ from sklearn.preprocessing import LabelEncoder
 from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.utils import class_weight
 import optuna
 from mex_eval import get_classification_report,get_confusion_matrix,get_scores
 from utils import save_xgb
 import argparse
+from mex_augment_data import random_oversample,smote_augment_embeddings,augment_data_with_adasyn,augment_data_with_oss,noise_augment_embeddings
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--tune", type=bool, help="hyperparameter tune or not")
+    parser.add_argument("--embeddings", type=str, help="which embeddings to train xgboost")
+    parser.add_argument("--augmentation", type=str, help="which augmentation technique to use")
     args = parser.parse_args()
 
     tune = args.tune
+    embeddings = args.embeddings
+    aug = args.augmentation
+
+    if embeddings == 'jina':
+        df = pd.read_csv('/content/drive/MyDrive/homo-mex-2024-jina-embeddings.csv')
+     # change the path according to which augmented version you are taking as all augmented df are hosted on drive 
+    else:
+        df = pd.read_csv('/content/drive/MyDrive/homo-mex-2024-spanish-bert-embeddings.csv')
     
-    df = pd.read_csv('/content/drive/MyDrive/homo-mex-2024-spanish-bert-embeddings.csv') # change the path according to which augmented version you are taking as all augmented df are hosted on drive 
+    if aug =='random':
+        df = random_oversample(df)
+    elif aug =='smote':
+        df = smote_augment_embeddings(df)
+    elif aug =='adasyn':
+        df = augment_data_with_adasyn(df)
+    else:
+        df = augment_data_with_oss(df)
 
     # le = LabelEncoder()
     # df['label'] = le.fit_transform(df['label'])
@@ -26,6 +45,9 @@ if __name__ == "__main__":
     class_names = ['NP','NR','P']
 
     X_train,X_test,y_train,y_test = train_test_split(df,labels_df,test_size = 0.20,random_state = 42,stratify=labels_df)
+    
+    classes_weights = class_weight.compute_sample_weight(class_weight='balanced',y=y_train['label'])
+
     print('\033[96m' + X_train.shape,X_test.shape+ '\033[0m')
 
     if tune:
