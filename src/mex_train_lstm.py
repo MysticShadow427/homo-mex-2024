@@ -1,8 +1,9 @@
+# extract word embedding from bert , use some augmentation technique and train a custom transformer or lstm, we choose this path as we need augmentations and after embeddings we can have augmentations
 from collections import defaultdict
 import argparse
-from mex_trainer import train_epoch,eval_model
+from mex_trainer import train_epoch_lstm,eval_model_lstm
 from mex_dataloader import create_data_loader
-from load_llm import MexSpanClassifier
+from load_lstm import MexSpanClassifierLSTM
 from utils import plot_accuracy_loss,save_training_history
 from transformers import AutoModel,AutoTokenizer,AdamW,get_linear_schedule_with_warmup
 import torch
@@ -13,19 +14,26 @@ import csv
 from sklearn.model_selection import train_test_split
 from mex_preprocess import remove_chars_except_punctuations,remove_newline_pattern,remove_numbers_and_urls,remove_pattern
 from mex_eval import get_confusion_matrix,get_predictions,get_scores,get_classification_report
-from load_lora_llm import MexSpanClassifierLoRA
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", type=int, help="number of epochs for training")
     parser.add_argument("--learning_rate",type=float,help="learning rate")
-    parser.add_argument("--batch_size",type=int,help="batch size forr training")
+    parser.add_argument("--batch_size",type=int,help="batch size for training")
+    parser.add_argument("--dropout",type=float,help="dropout between lstm layers")
+    parser.add_argument("--bidirectional",type=bool,help="Whether the lstm or Bilstm")
+    parser.add_argument("--num_layers",type=int,help="number of layers of lstm to stack")
+    parser.add_argument("--hidden_size",type=int,help="hidden size of lstm")
     args = parser.parse_args()
 
     EPOCHS = args.epochs
     batch_size = args.batch_size
     learning_rate = args.learning_rate
+    dropout = args.dropout
+    bidirectional = args.bidirectional
+    num_layers = args.num_layers
+    hidden_size = args.hidden_size
+
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print('\033[96m' + 'Device : ',device + '\033[0m')
@@ -72,8 +80,8 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained(checkpoint)
     print('\033[96m' + 'Tokenizer Loaded'+ '\033[0m')
     print()
-    model = MexSpanClassifier(n_classes=3).to(device)
-    print('\033[96m' + 'Model Spanish BERT Loaded'+ '\033[0m')
+    model = MexSpanClassifierLSTM(dropout,bidirectional,num_layers,hidden_size).to(device)
+    print('\033[96m' + 'Model Loaded'+ '\033[0m')
     print()
 
     train_data_loader = create_data_loader(train_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
@@ -103,24 +111,28 @@ if __name__ == "__main__":
         print('\033[96m' + f'Epoch {epoch + 1}/{EPOCHS}'+ '\033[0m')
         print('\033[96m' + '-' * 10+ '\033[0m')
 
-        train_acc, train_loss = train_epoch(
+        train_acc, train_loss = train_epoch_lstm(
             model,
             train_data_loader,
             loss_fn,
             optimizer,
             device,
             scheduler,
-            len(train_df)
+            len(train_df),
+            num_layers,
+            hidden_size
         )
 
         print('\033[96m' + f'Train loss {train_loss} accuracy {train_acc}'+ '\033[0m')
 
-        val_acc, val_loss = eval_model(
+        val_acc, val_loss = eval_model_lstm(
             model,
             val_data_loader,
             loss_fn,
             device,
-            len(val_df)
+            len(val_df),
+            num_layers,
+            hidden_size
         )
 
         print('\033[96m' + f'Val   loss {val_loss} accuracy {val_acc}'+ '\033[0m')
@@ -132,13 +144,15 @@ if __name__ == "__main__":
         history['val_loss'].append(val_loss)
 
         if val_acc > best_acc:
-            torch.save(model.state_dict(), '/content/homo-mex-2024/artifacts/best_model_state_full_fine_tune.bin')
-            torch.save(obj=model.state_dict(),f='/content/homo-mex-2024/artifacts/best_model_full_fine_tune.pth')
+            torch.save(model.state_dict(), '/content/homo-mex-2024/artifacts/best_model_state_lstm.bin')
+            torch.save(obj=model.state_dict(),f='/content/homo-mex-2024/artifacts/best_model_state_lstm.pth')
             best_acc = val_acc
     print()
     print('\033[96m' + 'Training finished'+ '\033[0m')
     print()
+
     plot_accuracy_loss(history)
+
     history_csv_file_path = "/content/homo-mex-2024/artifacts/history.csv"
     save_training_history(history=history,path=history_csv_file_path)
     print('\033[96m' + 'Training History saved'+ '\033[0m')
@@ -176,5 +190,6 @@ if __name__ == "__main__":
     get_scores(y_train,y_pred_train)
     get_confusion_matrix(y_train,y_pred_train)
     
+
 
 
