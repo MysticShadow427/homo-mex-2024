@@ -14,6 +14,7 @@
     - For LoRA fine tuning run the `train_lora_llm.py` and the model training will start with no bugs.
     - `mex_train_xgboost.py` is the file you need to run to train a *XgBoost* model on the sentence embeddings of the **Mex Span Dataset**.
     - *Sentence Embeddings* were taken as we need to augment the data and techniques like *SMOTE* and  *ADASYN* work only on numerical data.*Back Translation* technique (which is more robust) was also tried on the original dataset but it is giving OOM errors hence need to fix it.
+    - `mex_train_lstm.py` is used to train a lstm on top of the Spanish BERT extracted features.
 
 </hr>
 
@@ -47,6 +48,17 @@ Sure, here are the instructions formatted for better readability:
         - `"random"`: Apply random oversampling augmentation on your sentence embeddings.
         - `"oss"`: Apply OSS undersampling augmentation on your sentence embeddings.
 
+- **`mex_train_lstm.py`**
+
+    This script requires seven arguments:
+
+    1. `epochs`: A integer value for number of epochs of training.
+    2. `learning_rate`: A float value for learning rate of the optimizer
+    3. `batch_size`: A integer value specifying the batch size.
+    4. `dropout`: A float value for dropout prob between 2 layers.
+    5. `num_layers`:A integer value for setting the number of LSTM layers.
+    6. `bidirectional` : A integer value for setting the LSTM to be bidirectional or not , if **0** then no BiLSTM.
+    7. `hidden_size` : A integer value for dimensionality of the LSTM hidden space.
 <hr>
 
 *I think the best way to run the scripts is on Google Colab,host your data their and just run the `homo-mex-2024-main.ipynb`.*

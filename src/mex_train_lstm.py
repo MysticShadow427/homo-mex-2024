@@ -195,6 +195,3 @@ if __name__ == "__main__":
     get_scores(y_train,y_pred_train)
     get_confusion_matrix(y_train,y_pred_train)
     
-
-
-
