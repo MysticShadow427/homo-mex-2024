@@ -17,25 +17,40 @@
 
 </hr>
 
-**Instructions to run the Python Scripts** - 
-    - `mex_main.py` has 3 arguments to pass on - 
-        1. epochs
-        2. learning rate 
-        3. batch size
-    - `train_lora_llm.py` can be run directly without any argument but if you want to change some parameters you can edit on the machine you are hosting.
-    - `mex_train_xgboost.py` has also 3 arguments - 
-        1. tune -  a boolean if passed then the Xgboost will undergo hyperparameter tuning for finding the best parameters before training , this takes around 20-25 mins.
-        2. embeddings - this is a 'str' type argument which can take 2 values - 
-            1. "jina" - for using *jina-sentence-embeddings*
-            2. "spanish-bert" - to use *spanish-bert-sentence-embeddings*
-        3. augmentation - this is also a 'str' type which can take 4 values - 
-            1. "smote" - for smote augmentation on your sentence embeddings.
-            2. "adasyn" - for adasyn augmentation on your sentence embeddings.
-            3. "random" - for random oversampling augmentation on your sentence embeddings.
-            4. "oss" - for oss undersampling augmentation on your sentence embeddings.
+Sure, here are the instructions formatted for better readability:
+
+**Instructions to run the Python Scripts**
+
+- **`mex_main.py`**
+
+    This script requires three arguments to be passed:
+
+    1. `epochs`
+    2. `learning rate`
+    3. `batch size`
+
+- **`train_lora_llm.py`**
+
+    This script can be run directly without any arguments. However, if you wish to change some parameters, you can edit them on the machine where you are hosting the script.
+
+- **`mex_train_xgboost.py`**
+
+    This script requires three arguments:
+
+    1. `tune`: A boolean value. If passed as `True`, XGBoost will undergo hyperparameter tuning to find the best parameters before training. This process takes around 20-25 minutes.
+    2. `embeddings`: A string argument with two possible values:
+        - `"jina"`: Use Jina sentence embeddings.
+        - `"spanish-bert"`: Use Spanish BERT sentence embeddings.
+    3. `augmentation`: Another string argument with four possible values:
+        - `"smote"`: Apply SMOTE augmentation on your sentence embeddings.
+        - `"adasyn"`: Apply ADASYN augmentation on your sentence embeddings.
+        - `"random"`: Apply random oversampling augmentation on your sentence embeddings.
+        - `"oss"`: Apply OSS undersampling augmentation on your sentence embeddings.
+
+<hr>
 
 *I think the best way to run the scripts is on Google Colab,host your data their and just run the `homo-mex-2024-main.ipynb`.*
-
+<hr>
 <details>
   <summary>Next approaches planned</summary>
   - Using features from Spanish BERT and instead of directly applying a softmax layer we can train a another LSTM or Transformer.
