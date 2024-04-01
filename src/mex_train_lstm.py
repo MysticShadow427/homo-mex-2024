@@ -21,7 +21,7 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate",type=float,help="learning rate")
     parser.add_argument("--batch_size",type=int,help="batch size for training")
     parser.add_argument("--dropout",type=float,help="dropout between lstm layers")
-    parser.add_argument("--bidirectional",type=bool,help="Whether the lstm or Bilstm")
+    parser.add_argument("--bidirectional",type=int,help="Whether the lstm or Bilstm")
     parser.add_argument("--num_layers",type=int,help="number of layers of lstm to stack")
     parser.add_argument("--hidden_size",type=int,help="hidden size of lstm")
     args = parser.parse_args()
@@ -33,6 +33,11 @@ if __name__ == "__main__":
     bidirectional = args.bidirectional
     num_layers = args.num_layers
     hidden_size = args.hidden_size
+
+    if bidirectional == 0:
+        bidirectional = False
+    else:
+        bidirectional = True
 
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -80,7 +85,7 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained(checkpoint)
     print('\033[96m' + 'Tokenizer Loaded'+ '\033[0m')
     print()
-    model = MexSpanClassifierLSTM(dropout,bidirectional,num_layers,hidden_size).to(device)
+    model = MexSpanClassifierLSTM(dropout=dropout,bidirectional=bidirectional,num_layers=num_layers,hidden_size=hidden_size).to(device)
     print('\033[96m' + 'Model Loaded'+ '\033[0m')
     print()
 

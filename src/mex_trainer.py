@@ -60,22 +60,17 @@ def train_epoch_lstm(
     input_ids = d["input_ids"].to(device)
     attention_mask = d["attention_mask"].to(device)
     targets = d["targets"].to(device)
-    batch_size = input_ids.size(0)
-    h0 = torch.zeros(num_layers, batch_size, hidden_size).to(device)
-    c0 = torch.zeros(num_layers, batch_size, hidden_size).to(device)
-    hidden = (h0, c0)
 
 
     outputs = model(
       input_ids=input_ids,
-      attention_mask=attention_mask,
-      hidden = hidden
+      attention_mask=attention_mask
     )
 
     preds = torch.max(outputs, dim=1)
     loss = loss_fn(outputs, targets)
 
-    correct_predictions += torch.sum(preds == targets)
+    correct_predictions += torch.sum(preds.indices == targets)
     losses.append(loss.item())
 
     loss.backward()
@@ -123,21 +118,16 @@ def eval_model_lstm(model, data_loader, loss_fn, device, n_examples,num_layers,h
       input_ids = d["input_ids"].to(device)
       attention_mask = d["attention_mask"].to(device)
       targets = d["targets"].to(device)
-      batch_size = input_ids.size(0)
-      h0 = torch.zeros(num_layers, batch_size, hidden_size).to(device)
-      c0 = torch.zeros(num_layers, batch_size, hidden_size).to(device)
-      hidden = (h0, c0)
 
       outputs = model(
         input_ids=input_ids,
         attention_mask=attention_mask,
-        hidden = hidden
       )
       preds = torch.max(outputs, dim=1)
 
       loss = loss_fn(outputs, targets)
 
-      correct_predictions += torch.sum(preds == targets)
+      correct_predictions += torch.sum(preds.indices == targets)
       losses.append(loss.item())
 
   return correct_predictions.double() / n_examples, np.mean(losses)

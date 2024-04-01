@@ -20,9 +20,12 @@ class MexSpanClassifierLSTM(nn.Module):
         else:
             self.out = nn.Linear(in_features=self.hidden_size,out_features=3)
         
-    def forward(self, input_ids, attention_mask,hidden):
+    def forward(self, input_ids, attention_mask):
         seq_output,_ = self.feature_extractor(input_ids=input_ids,attention_mask=attention_mask)
-        outputs, (hn, cn) = self.lstm(seq_output,hidden)
+        batch_size = seq_output.size(0)
+        h0 = torch.zeros(self.num_layers * (2 if self.bidirectional else 1), batch_size, self.hidden_size).to('cuda')
+        c0 = torch.zeros(self.num_layers * (2 if self.bidirectional else 1), batch_size, self.hidden_size).to('cuda')
+        outputs, (hidden, cell) = self.lstm(seq_output, (h0, c0))
         logits = self.out(torch.mean(outputs,dim=1))
         return logits
         
