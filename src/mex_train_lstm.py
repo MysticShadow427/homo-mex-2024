@@ -194,4 +194,5 @@ if __name__ == "__main__":
     get_classification_report(y_train,y_pred_train)
     get_scores(y_train,y_pred_train)
     get_confusion_matrix(y_train,y_pred_train)
-    
+
+# currently getting around 78-79% accuracy using this method as we are training on imbalanced data
