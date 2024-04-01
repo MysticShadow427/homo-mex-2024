@@ -5,9 +5,11 @@ from mex_trainer import train_epoch_lstm,eval_model_lstm
 from mex_dataloader import create_data_loader
 from load_lstm import MexSpanClassifierLSTM
 from utils import plot_accuracy_loss,save_training_history
-from transformers import AutoModel,AutoTokenizer,AdamW,get_linear_schedule_with_warmup
+from transformers import AutoModel,AutoTokenizer
+from torch.optim.lr_scheduler import CosineAnnealingLR
 import torch
 import torch.nn as nn
+from torch.optim import Adam
 import pandas as pd
 import numpy as np
 import csv
@@ -98,12 +100,8 @@ if __name__ == "__main__":
     total_steps = len(train_data_loader) * EPOCHS
 
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = AdamW(model.parameters(), lr=learning_rate, correct_bias=False)
-    scheduler = get_linear_schedule_with_warmup(
-                optimizer,
-                num_warmup_steps=0,
-                num_training_steps=total_steps
-                )
+    optimizer = Adam(model.parameters(), lr=learning_rate)
+    scheduler = CosineAnnealingLR(optimizer,EPOCHS)
     print('\033[96m' + 'Loss function,Optimizer and Learning Rate Schedule set'+ '\033[0m')
     print()
 
