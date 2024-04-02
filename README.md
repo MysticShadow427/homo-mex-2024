@@ -1,5 +1,5 @@
 # homo-mex-2024
-**You can run the code either on Local Machine with a GPU or *Google Colab/Kaggle Environment* by cloning the repo and running the commands on the terminal or best way is to follow the commands given in `mex_main.py` and `mex_train_xgboost.py.`**
+**You can run the code either on Local Machine with a GPU or *Google Colab/Kaggle Environment* by cloning the repo and running the commands on the terminal or best way is to follow the commands given in `mex_main.py`,`mex_train_lstm.py` and `mex_train_xgboost.py.`**
 
 <hr>
 
@@ -17,8 +17,6 @@
     - `mex_train_lstm.py` is used to train a lstm on top of the Spanish BERT extracted features.
 
 </hr>
-
-Sure, here are the instructions formatted for better readability:
 
 **Instructions to run the Python Scripts**
 
