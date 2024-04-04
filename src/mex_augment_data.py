@@ -30,6 +30,26 @@ def random_oversample(df,random_seed = 42):
 
     return augmented_df
 
+def random_oversample_track_3(df,random_seed = 42):
+    """First technique to try is random oversampling"""
+    np.random.seed(random_seed)
+    class_1_df = df[df['label'] == 'NP']
+    class_3_df = df[df['label'] == 'P']
+
+    desired_samples = 560 
+
+    if len(class_3_df) < desired_samples:
+        oversampled_class_3_df = class_3_df.sample(n=desired_samples, replace=True)
+    else:
+        oversampled_class_3_df = class_3_df.sample(frac=1.0)  
+
+    augmented_df = pd.concat([class_1_df, oversampled_class_3_df])
+
+    augmented_df = augmented_df.sample(frac=1.0).reset_index(drop=True)
+
+    return augmented_df
+
+
 def noise_augment_embeddings():
     """Add noise to the embeddings to create new ones"""
     pass
