@@ -1,6 +1,7 @@
 import torch.nn as nn
 import numpy as np 
 import torch 
+from tqdm import tqdm
 
 def train_epoch(
   model,
@@ -16,7 +17,7 @@ def train_epoch(
   losses = []
   correct_predictions = 0
 
-  for d in data_loader:
+  for d in tqdm(data_loader):
     input_ids = d["input_ids"].to(device)
     attention_mask = d["attention_mask"].to(device)
     targets = d["targets"].to(device)
@@ -56,7 +57,7 @@ def train_epoch_lstm(
   losses = []
   correct_predictions = 0
 
-  for d in data_loader:
+  for d in tqdm(data_loader):
     input_ids = d["input_ids"].to(device)
     attention_mask = d["attention_mask"].to(device)
     targets = d["targets"].to(device)
@@ -89,7 +90,7 @@ def eval_model(model, data_loader, loss_fn, device, n_examples):
   correct_predictions = 0
 
   with torch.no_grad():
-    for d in data_loader:
+    for d in tqdm(data_loader):
       input_ids = d["input_ids"].to(device)
       attention_mask = d["attention_mask"].to(device)
       targets = d["targets"].to(device)
@@ -114,7 +115,7 @@ def eval_model_lstm(model, data_loader, loss_fn, device, n_examples,num_layers,h
   correct_predictions = 0
 
   with torch.no_grad():
-    for d in data_loader:
+    for d in tqdm(data_loader):
       input_ids = d["input_ids"].to(device)
       attention_mask = d["attention_mask"].to(device)
       targets = d["targets"].to(device)

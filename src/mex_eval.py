@@ -98,3 +98,40 @@ def get_scores(y_test,y_pred):
     print('Recall : ',recall_score(y_test,y_pred,average='weighted'))
     print()
     print('F-1 : ',f1_score(y_test,y_pred,average='weighted'))
+
+def generate_submission_track_1(model, data_loader):
+    # we need to write code according to the class names {'NR': 0, 'P': 1, 'NP': 2}
+    class_mapping = {'NR': 0, 'P': 1, 'NP': 2}
+    review_texts, predictions, prediction_probs, real_values = get_predictions(model,data_loader)
+    data = [('{}_Track1'.format(i), list(class_mapping.keys())[label.item()]) for i, label in enumerate(predictions)]
+    df = pd.DataFrame(data, columns=['sub_id', 'label'])
+    df.to_csv('/content/drive/MyDrive/homo_mex_track_1_sub.csv',index = False)
+    print('Submission CSV Generated')
+    
+
+def generate_submission_lora_track_1(model, data_loader):
+    class_mapping = {'NP': 0, 'NR': 1, 'P': 2}
+    predictions, prediction_probs, real_values = get_peft_predictions(model, data_loader)
+    data = [('{}_Track1'.format(i), list(class_mapping.keys())[label.item()]) for i, label in enumerate(predictions)]
+    df = pd.DataFrame(data, columns=['sub_id', 'label'])
+    df.to_csv('/content/drive/MyDrive/homo_mex_track_1_lora_sub.csv',index = False)
+    print('Submission CSV Generated')
+
+def generate_submission_track_3(model, data_loader):
+    # we need to write code according to the class names {'NR': 0, 'P': 1, 'NP': 2}
+    class_mapping = {'P': 0, 'NP': 1}
+    review_texts, predictions, prediction_probs, real_values = get_predictions(model,data_loader)
+    data = [('{}_Track3'.format(i), list(class_mapping.keys())[label.item()]) for i, label in enumerate(predictions)]
+    df = pd.DataFrame(data, columns=['sub_id', 'label'])
+    df.to_csv('/content/drive/MyDrive/homo_mex_track_2_sub.csv',index = False)
+    print('Submission CSV Generated')
+    
+
+def generate_submission_lora_track_3(model, data_loader):
+    class_mapping = {'NP': 0, 'P': 1}
+    predictions, prediction_probs, real_values = get_peft_predictions(model, data_loader)
+    data = [('{}_Track3'.format(i), list(class_mapping.keys())[label.item()]) for i, label in enumerate(predictions)]
+    df = pd.DataFrame(data, columns=['sub_id', 'label'])
+    df.to_csv('/content/drive/MyDrive/homo_mex_track_2_lora_sub.csv',index = False)
+    print('Submission CSV Generated')
+
