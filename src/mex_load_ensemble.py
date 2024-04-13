@@ -7,7 +7,7 @@ model_2 = 'JonatanGk/roberta-base-bne-finetuned-cyberbullying-spanish'
 model_3 = 'microsoft/mdeberta-v3-base'
 
 class MexClassifierEnsemble(nn.Module):
-    def __init__(self,):
+    def __init__(self):
         super().__init__()
         self.dropout = 0.4
         self.hidden_1 = 1000

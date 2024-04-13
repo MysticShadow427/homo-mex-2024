@@ -1,4 +1,3 @@
-# extract word embedding from bert , use some augmentation technique and train a custom transformer or lstm, we choose this path as we need augmentations and after embeddings we can have augmentations
 from collections import defaultdict
 import argparse
 from mex_trainer import train_epoch_lstm,eval_model_lstm
@@ -11,8 +10,6 @@ import torch
 import torch.nn as nn
 from torch.optim import Adam
 import pandas as pd
-import numpy as np
-import csv
 from sklearn.model_selection import train_test_split
 from mex_preprocess import remove_chars_except_punctuations,remove_newline_pattern,remove_numbers_and_urls,remove_pattern
 from mex_eval import get_confusion_matrix,get_predictions,get_scores,get_classification_report

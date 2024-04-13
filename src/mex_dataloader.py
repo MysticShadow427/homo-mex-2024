@@ -107,4 +107,47 @@ def create_data_loader(df, tokenizer, max_len, batch_size):
     shuffle=True
   )
 
-# make a dataloader for smote augmented embeddings from 3 different models we will use simple dense neural nets
+def create_data_loader_ensemble(df, bert_tokenizer,roberta_tokenizer,deberta_tokenizer, max_len, batch_size):
+  ds = MexSpanEnsembleDataset(
+    reviews=df.content.to_numpy(),
+    targets=df.label.to_numpy(),
+    bert_tokenizer=bert_tokenizer,
+    roberta_tokenizer= roberta_tokenizer,
+    deberta_tokenizer=deberta_tokenizer,
+    max_len=max_len
+  )
+
+  return DataLoader(
+    ds,
+    batch_size=batch_size,
+    shuffle=True
+  )
+
+class MexSpanDenseEnsembleDataset(Dataset):
+  def __init__(self, dataframe1, dataframe2, dataframe3,target_df):
+        assert len(dataframe1) == len(dataframe2) == len(dataframe3), "Dataframes must have the same length"
+        self.dataframe1 = dataframe1
+        self.dataframe2 = dataframe2
+        self.dataframe3 = dataframe3
+        self.target_df = target_df
+
+  def __len__(self):
+      return len(self.dataframe1)
+
+  def __getitem__(self, index):
+      row1 = self.dataframe1.iloc[index].values
+      row2 = self.dataframe2.iloc[index].values
+      row3 = self.dataframe3.iloc[index].values
+      targets = self.target_df.iloc[index].values
+
+      tensor1 = torch.tensor(row1, dtype=torch.float32)
+      tensor2 = torch.tensor(row2, dtype=torch.float32)
+      tensor3 = torch.tensor(row3, dtype=torch.float32)
+      targets = torch.tensor(targets, dtype=torch.long)
+
+      return tensor1, tensor2, tensor3,targets
+
+def create_dense_ensemble_dataloader(dataframe1, dataframe2, dataframe3,batch_size):
+   ds = MexSpanDenseEnsembleDataset(dataframe1, dataframe2, dataframe3)
+
+   return DataLoader(ds,batch_size=batch_size,shuffle=True)

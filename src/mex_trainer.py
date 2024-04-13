@@ -41,6 +41,47 @@ def train_epoch(
 
   return correct_predictions.double() / n_examples, np.mean(losses)
 
+def train_epoch_dense_ensemble(
+  model,
+  data_loader,
+  loss_fn,
+  optimizer,
+  device,
+  scheduler,
+  n_examples
+):
+  model = model.train()
+
+  losses = []
+  correct_predictions = 0
+
+  for d in tqdm(data_loader):
+    bert_embeds = d[0].to(device)
+    roberta_embeds = d[1].to(device)
+    deberta_embeds = d[2].to(device)
+    targets = d[3].to(device)
+
+    outputs = model(
+      bert_embeds,
+      roberta_embeds,
+      deberta_embeds
+    )
+
+    _, preds = torch.max(outputs, dim=1)
+    loss = loss_fn(outputs, targets)
+
+    correct_predictions += torch.sum(preds == targets)
+    losses.append(loss.item())
+
+    loss.backward()
+    nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+    optimizer.step()
+    scheduler.step()
+    optimizer.zero_grad()
+
+  return correct_predictions.double() / n_examples, np.mean(losses)
+
+
 def train_epoch_ensemble(
   model,
   data_loader,
@@ -144,6 +185,33 @@ def eval_model(model, data_loader, loss_fn, device, n_examples):
       outputs = model(
         input_ids=input_ids,
         attention_mask=attention_mask
+      )
+      _, preds = torch.max(outputs, dim=1)
+
+      loss = loss_fn(outputs, targets)
+
+      correct_predictions += torch.sum(preds == targets)
+      losses.append(loss.item())
+
+  return correct_predictions.double() / n_examples, np.mean(losses)
+
+def eval_model_dense_ensemble(model, data_loader, loss_fn, device, n_examples):
+  model = model.eval()
+
+  losses = []
+  correct_predictions = 0
+
+  with torch.no_grad():
+    for d in tqdm(data_loader):
+      bert_embeds = d[0].to(device)
+      roberta_embeds = d[1].to(device)
+      deberta_embeds = d[2].to(device)
+      targets = d[3].to(device)
+
+      outputs = model(
+        bert_embeds,
+        roberta_embeds,
+        deberta_embeds
       )
       _, preds = torch.max(outputs, dim=1)
 
