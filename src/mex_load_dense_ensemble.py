@@ -44,6 +44,7 @@ class MexClassifierDenseEnsemble(nn.Module):
         roberta_hidden_embeds = self.roberta_features(roberta_embeds)
         deberta_hidden_embeds = self.deberta_features(deberta_embeds)
 
-        logits = self.classifier(torch.stack(bert_hidden_embeds,roberta_hidden_embeds,deberta_hidden_embeds),axis = 1)
+        stacked_tensor = torch.stack(bert_hidden_embeds,roberta_hidden_embeds,deberta_hidden_embeds,axis = 1)
+        logits = self.classifier(torch.flatten(stacked_tensor,start_dim=1))
         
         return logits
