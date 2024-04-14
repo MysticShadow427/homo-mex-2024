@@ -58,8 +58,8 @@ if __name__ == "__main__":
     print('\033[96m' + 'Model Loaded'+ '\033[0m')
     print()
 
-    train_data_loader = create_dense_ensemble_dataloader(X_train_bert,X_train_roberta,X_train_deberta,batch_size=batch_size)
-    val_data_loader = create_dense_ensemble_dataloader(X_val_bert,X_val_roberta,X_val_deberta,batch_size=batch_size)
+    train_data_loader = create_dense_ensemble_dataloader(X_train_bert,X_train_roberta,X_train_deberta,y_train_df,batch_size=batch_size)
+    val_data_loader = create_dense_ensemble_dataloader(X_val_bert,X_val_roberta,X_val_deberta,y_val_df,batch_size=batch_size)
     # test_data_loader = None
     print('\033[96m' + 'Dataloaders created')
     print()

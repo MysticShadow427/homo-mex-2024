@@ -147,7 +147,7 @@ class MexSpanDenseEnsembleDataset(Dataset):
 
       return tensor1, tensor2, tensor3,targets
 
-def create_dense_ensemble_dataloader(dataframe1, dataframe2, dataframe3,batch_size):
-   ds = MexSpanDenseEnsembleDataset(dataframe1, dataframe2, dataframe3)
+def create_dense_ensemble_dataloader(dataframe1, dataframe2, dataframe3,targets,batch_size):
+   ds = MexSpanDenseEnsembleDataset(dataframe1, dataframe2, dataframe3,targets)
 
    return DataLoader(ds,batch_size=batch_size,shuffle=True)
