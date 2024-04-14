@@ -55,8 +55,8 @@ class MexClassifierEnsemble(nn.Module):
         _, roberta_pooled_output = self.roberta(
       input_ids=roberta_input_ids,
       attention_mask=roberta_attention_mask
-    )
-        _, deberta_pooled_output = self.deberta(
+    ) # rather than this we can have simple sentence transformers but we then also need to change the dataloaders too
+        deberta_output = self.deberta(
       input_ids=deberta_input_ids,
       attention_mask=deberta_attention_mask
     )
@@ -68,11 +68,13 @@ class MexClassifierEnsemble(nn.Module):
         roberta_embeds = self.roberta_hidden_2(roberta_embeds)
         roberta_embeds = self.roberta_hidden_3(roberta_embeds)
 
+        deberta_pooled_output = torch.mean(deberta_output[0],dim = 1)
         deberta_embeds = self.deberta_hidden_1(deberta_pooled_output)
         deberta_embeds = self.deberta_hidden_2(deberta_embeds)
         deberta_embeds = self.deberta_hidden_3(deberta_embeds)
 
-        logits = self.classifier(torch.stack((bert_embeds, roberta_embeds, deberta_embeds), dim=1))
+        stacked_tensor = torch.stack((bert_embeds, roberta_embeds, deberta_embeds), dim=1)
+        logits = self.classifier(torch.flatten(stacked_tensor,start_dim=1))
         return logits
         
 
