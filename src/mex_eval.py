@@ -76,6 +76,80 @@ def get_predictions(model, data_loader):
     real_values = torch.stack(real_values).cpu()
     return review_texts, predictions, prediction_probs, real_values
 
+def get_predictions_dense_ensemble(model, data_loader):
+    model = model.eval()
+
+    review_texts = []
+    predictions = []
+    prediction_probs = []
+    real_values = []
+
+    with torch.no_grad():
+        for d in data_loader:
+            bert_embeds = d[0].to(device)
+            roberta_embeds = d[1].to(device)
+            deberta_embeds = d[2].to(device)
+            targets = d[3].to(device)
+
+            outputs = model(
+                bert_embeds,
+                roberta_embeds,
+                deberta_embeds
+            )
+            _, preds = torch.max(outputs, dim=1)
+
+            probs = F.softmax(outputs, dim=1)
+
+
+            predictions.extend(preds)
+            prediction_probs.extend(probs)
+            real_values.extend(targets)
+
+    predictions = torch.stack(predictions).cpu()
+    prediction_probs = torch.stack(prediction_probs).cpu()
+    real_values = torch.stack(real_values).cpu()
+    return review_texts, predictions, prediction_probs, real_values
+
+def get_predictions_ensemble(model, data_loader):
+    model = model.eval()
+
+    review_texts = []
+    predictions = []
+    prediction_probs = []
+    real_values = []
+
+    with torch.no_grad():
+        for d in data_loader:
+
+            bert_input_ids = d["bert_input_ids"].to(device)
+            bert_attention_mask = d["bert_attention_mask"].to(device)
+            roberta_input_ids = d["roberta_input_ids"].to(device)
+            roberta_attention_mask = d["roberta_attention_mask"].to(device)
+            deberta_input_ids = d["deberta_input_ids"].to(device)
+            deberta_attention_mask = d["deberta_attention_mask"].to(device)
+            targets = d["targets"].to(device)
+
+            outputs = model(
+            bert_input_ids,
+            bert_attention_mask,
+            roberta_input_ids,
+            roberta_attention_mask,
+            deberta_input_ids,
+            deberta_attention_mask
+            )
+            _, preds = torch.max(outputs, dim=1)
+
+            probs = F.softmax(outputs, dim=1)
+
+            predictions.extend(preds)
+            prediction_probs.extend(probs)
+            real_values.extend(targets)
+
+    predictions = torch.stack(predictions).cpu()
+    prediction_probs = torch.stack(prediction_probs).cpu()
+    real_values = torch.stack(real_values).cpu()
+    return review_texts, predictions, prediction_probs, real_values
+
 def get_classification_report(y_test, y_pred):
     print(classification_report(y_test, y_pred))
 

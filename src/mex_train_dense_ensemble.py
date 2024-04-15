@@ -10,7 +10,7 @@ import torch.nn as nn
 from torch.optim import Adam
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from mex_eval import get_confusion_matrix,get_predictions,get_scores,get_classification_report
+from mex_eval import get_confusion_matrix,get_predictions_dense_ensemble,get_scores,get_classification_report
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -137,8 +137,8 @@ if __name__ == "__main__":
     print('\033[96m' + 'Getting Predictions...'+ '\033[0m')
     print()
     # y_review_texts_test, y_pred_test, y_pred_probs_test, y_test = get_predictions(model,test_data_loader)
-    y_review_texts_val, y_pred_val, y_pred_probs_val, y_val = get_predictions(model,val_data_loader)
-    y_review_texts_train, y_pred_train, y_pred_probs_train, y_train = get_predictions(model,train_data_loader)
+    y_review_texts_val, y_pred_val, y_pred_probs_val, y_val = get_predictions_dense_ensemble(model,val_data_loader)
+    y_review_texts_train, y_pred_train, y_pred_probs_train, y_train = get_predictions_dense_ensemble(model,train_data_loader)
 
     # print('Test Data Classification Report : ')
     # print()

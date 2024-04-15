@@ -68,7 +68,7 @@ def train_epoch_dense_ensemble(
     )
 
     _, preds = torch.max(outputs, dim=1)
-    loss = loss_fn(outputs, targets)
+    loss = loss_fn(outputs, targets.squeeze())
 
     correct_predictions += torch.sum(preds == targets)
     losses.append(loss.item())
@@ -215,7 +215,7 @@ def eval_model_dense_ensemble(model, data_loader, loss_fn, device, n_examples):
       )
       _, preds = torch.max(outputs, dim=1)
 
-      loss = loss_fn(outputs, targets)
+      loss = loss_fn(outputs, targets.squeeze())
 
       correct_predictions += torch.sum(preds == targets)
       losses.append(loss.item())
