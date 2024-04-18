@@ -8,7 +8,7 @@ from transformers import AutoTokenizer
 from torch.optim.lr_scheduler import CosineAnnealingLR
 import torch
 import torch.nn as nn
-from torch.optim import Adam
+from torch.optim import AdamW
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from mex_preprocess import remove_chars_except_punctuations,remove_newline_pattern,remove_numbers_and_urls,remove_pattern
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     total_steps = len(train_data_loader) * EPOCHS
 
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = Adam(model.parameters(), lr=learning_rate)
+    optimizer = AdamW(model.parameters(), lr=learning_rate)
     scheduler = CosineAnnealingLR(optimizer,EPOCHS)
     print('\033[96m' + 'Loss function,Optimizer and Learning Rate Schedule set'+ '\033[0m')
     print()
