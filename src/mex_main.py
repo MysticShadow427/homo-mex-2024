@@ -11,9 +11,10 @@ import pandas as pd
 import numpy as np
 import csv
 from sklearn.model_selection import train_test_split
-from mex_preprocess import remove_chars_except_punctuations,remove_newline_pattern,remove_numbers_and_urls,remove_pattern
-from mex_eval import get_confusion_matrix,get_predictions,get_scores,get_classification_report
-from load_lora_llm import MexSpanClassifierLoRA
+from mex_preprocess import remove_chars_except_punctuations,remove_newline_pattern,remove_numbers_and_urls,remove_pattern,remove_emojis
+from mex_eval import get_confusion_matrix,get_predictions,get_scores,get_classification_report,generate_submission_track_1
+from mex_augment_data import random_oversample
+from load_lora_llm import MexSpanClassifier
 
 
 if __name__ == "__main__":
@@ -31,19 +32,37 @@ if __name__ == "__main__":
     print('\033[96m' + 'Device : ',device + '\033[0m')
     print()
 
-    df = pd.read_csv('/content/homo-mex-2024/data/public_data_dev_phase/track_1_dev.csv')
+    train_df = pd.read_csv('/content/homo-mex-2024/data/public_data_train_phase/track_1_dev.csv')
+    val_df = pd.read_csv('/content/homo-mex-2024/data/public_data_dev_phase/track_1_dev.csv')
+    test_df = pd.read_csv('/content/homo-mex-2024/data/public_data_test/track_1_dev.csv')
 
-    df['content'] = df['content'].apply(remove_pattern)
-    df['content'] = df['content'].apply(remove_numbers_and_urls)
-    df['content'] = df['content'].apply(remove_chars_except_punctuations)
-    df['content'] = df['content'].apply(remove_newline_pattern)
-    X = df['content']
-    y = df['label']
+    train_df['content'] = train_df['content'].apply(remove_pattern)
+    train_df['content'] = train_df['content'].apply(remove_numbers_and_urls)
+    train_df['content'] = train_df['content'].apply(remove_chars_except_punctuations)
+    train_df['content'] = train_df['content'].apply(remove_newline_pattern)
+    train_df['content'] = train_df['content'].apply(remove_emojis)
+    train_df = random_oversample(train_df)
 
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42,stratify=y)
+    val_df['content'] = val_df['content'].apply(remove_pattern)
+    val_df['content'] = val_df['content'].apply(remove_numbers_and_urls)
+    val_df['content'] = val_df['content'].apply(remove_chars_except_punctuations)
+    val_df['content'] = val_df['content'].apply(remove_newline_pattern)
+    val_df['content'] = val_df['content'].apply(remove_emojis)
 
-    train_df = pd.DataFrame({'content': X_train, 'label': y_train})
-    val_df = pd.DataFrame({'content': X_val, 'label': y_val})
+    test_df['content'] = test_df['content'].apply(remove_pattern)
+    test_df['content'] = test_df['content'].apply(remove_numbers_and_urls)
+    test_df['content'] = test_df['content'].apply(remove_chars_except_punctuations)
+    test_df['content'] = test_df['content'].apply(remove_newline_pattern)
+    test_df['content'] = test_df['content'].apply(remove_emojis)
+
+    
+    # X = df['content']
+    # y = df['label']
+
+    # X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42,stratify=y)
+
+    # train_df = pd.DataFrame({'content': X_train, 'label': y_train})
+    # val_df = pd.DataFrame({'content': X_val, 'label': y_val})
     
     # test_df = pd.read_csv('/content/homo-mex-2024/data/public_data_test_phase/track_1_test.csv')
     print('\033[96m' + 'Loaded Training, validation and test dataframes'+ '\033[0m')
@@ -78,7 +97,7 @@ if __name__ == "__main__":
 
     train_data_loader = create_data_loader(train_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
     val_data_loader = create_data_loader(val_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
-    # test_data_loader = create_data_loader(test_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
+    test_data_loader = create_data_loader(test_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
     print('\033[96m' + 'Dataloaders created')
     print()
 
@@ -143,16 +162,16 @@ if __name__ == "__main__":
     save_training_history(history=history,path=history_csv_file_path)
     print('\033[96m' + 'Training History saved'+ '\033[0m')
     print()
-    # test_acc, _ = eval_model(
-    #     model,
-    #     test_data_loader,
-    #     loss_fn,
-    #     device,
-    #     len(test_df)
-    #     )
+    test_acc, _ = eval_model(
+        model,
+        test_data_loader,
+        loss_fn,
+        device,
+        len(test_df)
+        )
 
-    # print('Test Accuracy',test_acc.item())
-    # print()
+    print('Test Accuracy',test_acc.item())
+    print()
 
     print('\033[96m' + 'Getting Predictions...'+ '\033[0m')
     print()
@@ -175,6 +194,7 @@ if __name__ == "__main__":
     get_classification_report(y_train,y_pred_train)
     get_scores(y_train,y_pred_train)
     get_confusion_matrix(y_train,y_pred_train)
+    generate_submission_track_1(model,test_data_loader)
     
 
 

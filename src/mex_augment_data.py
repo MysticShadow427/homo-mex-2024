@@ -5,14 +5,12 @@ from imblearn.over_sampling import SMOTE,ADASYN
 from imblearn.under_sampling import OneSidedSelection
 from sklearn.preprocessing import LabelEncoder
 
-def random_oversample(df,random_seed = 42):
+def random_oversample(df,random_seed = 42,desired_samples = 5400):
     """First technique to try is random oversampling"""
     np.random.seed(random_seed)
     class_1_df = df[df['label'] == 'NP']
     class_2_df = df[df['label'] == 'NR']
     class_3_df = df[df['label'] == 'P']
-
-    desired_samples = 4000
 
     if len(class_2_df) < desired_samples:
         oversampled_class_2_df = class_2_df.sample(n=desired_samples, replace=True)
