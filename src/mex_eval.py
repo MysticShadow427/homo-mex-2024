@@ -42,6 +42,40 @@ def get_peft_predictions(model, data_loader):
     real_values = torch.stack(real_values).cpu()
     return predictions, prediction_probs, real_values
 
+def get_predictions_test(model, data_loader):
+    model = model.eval()
+
+    review_texts = []
+    predictions = []
+    prediction_probs = []
+    real_values = []
+
+    with torch.no_grad():
+        for d in data_loader:
+
+            texts = d["review_text"]
+            input_ids = d["input_ids"].to(device)
+            attention_mask = d["attention_mask"].to(device)
+            # targets = d["targets"].to(device)
+
+            outputs = model(
+                input_ids=input_ids,
+                attention_mask=attention_mask
+            )
+            _, preds = torch.max(outputs, dim=1)
+
+            probs = F.softmax(outputs, dim=1)
+
+            review_texts.extend(texts)
+            predictions.extend(preds)
+            prediction_probs.extend(probs)
+            # real_values.extend(targets)
+
+    predictions = torch.stack(predictions).cpu()
+    prediction_probs = torch.stack(prediction_probs).cpu()
+    real_values = torch.stack(real_values).cpu()
+    return review_texts, predictions, prediction_probs, real_values
+
 def get_predictions(model, data_loader):
     model = model.eval()
 
@@ -176,7 +210,7 @@ def get_scores(y_test,y_pred):
 def generate_submission_track_1(model, data_loader):
     # we need to write code according to the class names {'NR': 0, 'P': 1, 'NP': 2}
     class_mapping = {'NR': 0, 'P': 1, 'NP': 2}
-    review_texts, predictions, prediction_probs, real_values = get_predictions(model,data_loader)
+    review_texts, predictions, prediction_probs, real_values = get_predictions_test(model,data_loader)
     data = [('{}_Track1'.format(i), list(class_mapping.keys())[label.item()]) for i, label in enumerate(predictions)]
     df = pd.DataFrame(data, columns=['sub_id', 'label'])
     df.to_csv('/content/drive/MyDrive/homo_mex_track_1_sub.csv',index = False)

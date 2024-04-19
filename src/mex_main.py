@@ -1,7 +1,7 @@
 from collections import defaultdict
 import argparse
 from mex_trainer import train_epoch,eval_model
-from mex_dataloader import create_data_loader
+from mex_dataloader import create_data_loader,create_data_loader_test
 from load_llm import MexSpanClassifier
 from utils import plot_accuracy_loss,save_training_history
 from transformers import AutoModel,AutoTokenizer,AdamW,get_linear_schedule_with_warmup
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     train_df = pd.read_csv('/content/homo-mex-2024/data/public_data_train_phase/track_1_train.csv')
     val_df = pd.read_csv('/content/homo-mex-2024/data/public_data_dev_phase/track_1_dev.csv')
-    test_df = pd.read_csv('/content/homo-mex-2024/data/public_data_test/track_1_test.csv')
+    test_df = pd.read_csv('/content/homo-mex-2024/data/public_data_test/track_1_public_test.csv')
 
     train_df['content'] = train_df['content'].apply(remove_pattern)
     train_df['content'] = train_df['content'].apply(remove_numbers_and_urls)
@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
     train_data_loader = create_data_loader(train_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
     val_data_loader = create_data_loader(val_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
-    test_data_loader = create_data_loader(test_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
+    test_data_loader = create_data_loader_test(test_df,tokenizer=tokenizer,max_len=100,batch_size=batch_size)
     print('\033[96m' + 'Dataloaders created')
     print()
 

@@ -107,6 +107,54 @@ def create_data_loader(df, tokenizer, max_len, batch_size):
     shuffle=True
   )
 
+class MexSpanDatasetTest(Dataset):
+
+  def __init__(self, reviews, tokenizer, max_len):
+    self.reviews = reviews
+    # self.targets = targets
+    self.tokenizer = tokenizer
+    self.max_len = max_len
+
+  def __len__(self):
+    return len(self.reviews)
+
+  def __getitem__(self, item):
+    review = str(self.reviews[item])
+    target = self.targets[item]
+
+    encoding = self.tokenizer.encode_plus(
+      review,
+      truncation = True,
+      add_special_tokens=True,
+      max_length=self.max_len,
+      return_token_type_ids=False,
+      pad_to_max_length=True,
+      return_attention_mask=True,
+      return_tensors='pt',
+    )
+
+    return {
+      'review_text': review,
+      'input_ids': encoding['input_ids'].flatten(),
+      'attention_mask': encoding['attention_mask'].flatten()
+    #   'targets': torch.tensor(target, dtype=torch.long)
+    }
+
+def create_data_loader_test(df, tokenizer, max_len, batch_size):
+  ds = MexSpanDatasetTest(
+    reviews=df.content.to_numpy(),
+    # targets=df.label.to_numpy(),
+    tokenizer=tokenizer,
+    max_len=max_len
+  )
+
+  return DataLoader(
+    ds,
+    batch_size=batch_size,
+    shuffle=False
+  )
+
+
 def create_data_loader_ensemble(df, bert_tokenizer,roberta_tokenizer,deberta_tokenizer, max_len, batch_size):
   ds = MexSpanEnsembleDataset(
     reviews=df.content.to_numpy(),
