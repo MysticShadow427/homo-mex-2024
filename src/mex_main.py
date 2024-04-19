@@ -69,11 +69,6 @@ if __name__ == "__main__":
     print()
 
 
-    # test_df['content'] = test_df['content'].apply(remove_pattern)
-    # test_df['content'] = test_df['content'].apply(remove_numbers_and_urls)
-    # test_df['content'] = test_df['content'].apply(remove_chars_except_punctuations)
-    # test_df['content'] = test_df['content'].apply(remove_newline_pattern)
-
     print('\033[96m' + 'Preprocessing of Data done'+ '\033[0m')
     print()
 
@@ -161,16 +156,6 @@ if __name__ == "__main__":
     history_csv_file_path = "/content/homo-mex-2024/artifacts/history.csv"
     save_training_history(history=history,path=history_csv_file_path)
     print('\033[96m' + 'Training History saved'+ '\033[0m')
-    print()
-    test_acc, _ = eval_model(
-        model,
-        test_data_loader,
-        loss_fn,
-        device,
-        len(test_df)
-        )
-
-    print('Test Accuracy',test_acc.item())
     print()
 
     print('\033[96m' + 'Getting Predictions...'+ '\033[0m')

@@ -120,7 +120,7 @@ class MexSpanDatasetTest(Dataset):
 
   def __getitem__(self, item):
     review = str(self.reviews[item])
-    target = self.targets[item]
+    # target = self.targets[item]
 
     encoding = self.tokenizer.encode_plus(
       review,

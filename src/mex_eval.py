@@ -73,7 +73,6 @@ def get_predictions_test(model, data_loader):
 
     predictions = torch.stack(predictions).cpu()
     prediction_probs = torch.stack(prediction_probs).cpu()
-    real_values = torch.stack(real_values).cpu()
     return review_texts, predictions, prediction_probs, real_values
 
 def get_predictions(model, data_loader):
@@ -213,7 +212,7 @@ def generate_submission_track_1(model, data_loader):
     review_texts, predictions, prediction_probs, real_values = get_predictions_test(model,data_loader)
     data = [('{}_Track1'.format(i), list(class_mapping.keys())[label.item()]) for i, label in enumerate(predictions)]
     df = pd.DataFrame(data, columns=['sub_id', 'label'])
-    df.to_csv('/content/drive/MyDrive/homo_mex_track_1_sub.csv',index = False)
+    df.to_csv('/content/drive/MyDrive/homo_mex_track_1_full_fine_tune_sub.csv',index = False)
     print('Submission CSV Generated')
     
 
@@ -231,7 +230,7 @@ def generate_submission_track_3(model, data_loader):
     review_texts, predictions, prediction_probs, real_values = get_predictions(model,data_loader)
     data = [('{}_Track3'.format(i), list(class_mapping.keys())[label.item()]) for i, label in enumerate(predictions)]
     df = pd.DataFrame(data, columns=['sub_id', 'label'])
-    df.to_csv('/content/drive/MyDrive/homo_mex_track_2_sub.csv',index = False)
+    df.to_csv('/content/drive/MyDrive/homo_mex_track_3_sub.csv',index = False)
     print('Submission CSV Generated')
     
 
@@ -240,6 +239,19 @@ def generate_submission_lora_track_3(model, data_loader):
     predictions, prediction_probs, real_values = get_peft_predictions(model, data_loader)
     data = [('{}_Track3'.format(i), list(class_mapping.keys())[label.item()]) for i, label in enumerate(predictions)]
     df = pd.DataFrame(data, columns=['sub_id', 'label'])
-    df.to_csv('/content/drive/MyDrive/homo_mex_track_2_lora_sub.csv',index = False)
+    df.to_csv('/content/drive/MyDrive/homo_mex_track_3_lora_sub.csv',index = False)
     print('Submission CSV Generated')
 
+def generate_submission_xgboost_track_1(model,X_test,le):
+    predictions = model.predict(X_test)
+    data = [
+    ('{}_Track1'.format(i), le.inverse_transform([label])[0]) 
+    for i, label in enumerate(predictions)
+    ]
+    df = pd.DataFrame(data, columns=['sub_id', 'label'])
+    df.to_csv('/content/drive/MyDrive/homo_mex_track_1_sub_xgboost.csv',index = False)
+    print('Submission CSV Generated')
+
+
+
+    

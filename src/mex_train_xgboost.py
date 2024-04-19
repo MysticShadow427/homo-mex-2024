@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.utils import class_weight
 import optuna
-from mex_eval import get_classification_report,get_confusion_matrix,get_scores
+from mex_eval import get_classification_report,get_confusion_matrix,get_scores,generate_submission_xgboost_track_1
 from utils import save_xgb
 import argparse
 from mex_augment_data import random_oversample,smote_augment_embeddings,augment_data_with_adasyn,augment_data_with_oss,noise_augment_embeddings
@@ -27,31 +27,33 @@ if __name__ == "__main__":
         df = pd.read_csv('/content/drive/MyDrive/homo-mex-2024-jina-embeddings.csv')
      # change the path according to which augmented version you are taking as all augmented df are hosted on drive 
     else:
-        df = pd.read_csv('/content/drive/MyDrive/homo-mex-2024-spanish-bert-embeddings.csv')
+        train_df = pd.read_csv('/content/drive/MyDrive/homo-mex-2024-spanish-bert-train-embeddings-track-1.csv')
+        val_df = pd.read_csv('/content/drive/MyDrive/homo-mex-2024-spanish-bert-val-embeddings-track-1.csv')
+        test_df = pd.read_csv('/content/drive/MyDrive/homo-mex-2024-spanish-bert-test-embeddings-track-1.csv')
     
     if aug =='random':
-        df = random_oversample(df)
+        train_df = random_oversample(train_df)
     elif aug =='smote':
-        df = smote_augment_embeddings(df)
+        train_df = smote_augment_embeddings(train_df)
+        
     elif aug =='adasyn':
-        df = augment_data_with_adasyn(df)
+        train_df = augment_data_with_adasyn(train_df)
     else:
-        df = augment_data_with_oss(df)
+        train_df = augment_data_with_oss(train_df)
 
     le = LabelEncoder()
-    df['label'] = le.fit_transform(df['label'])
-    labels_df = pd.DataFrame(df['label'].values,columns = ['label'])
-    df_ = df.drop('label',axis = 1)
+    train_df['label'] = le.fit_transform(train_df['label'])
+    classes_weights = class_weight.compute_sample_weight(class_weight='balanced',y=train_df['label'])
+    val_df['label'] = le.transform(val_df['label'])
+    train_labels_df = pd.DataFrame(train_df['label'].values,columns = ['label'])
+    val_labels_df = pd.DataFrame(val_df['label'].values,columns = ['label'])
+    train_df_ = train_df.drop('label',axis = 1)
+    val_df_ = val_df.drop('label',axis=1)
     # class_names = ['NP','NR','P']
-    
-
-    X_train,X_test,y_train,y_test = train_test_split(df_,labels_df,test_size = 0.20,random_state = 42,stratify=labels_df)
-    
-    classes_weights = class_weight.compute_sample_weight(class_weight='balanced',y=y_train['label'])
-
-    # print('\033[96m' + X_train.shape+ '\033[0m')
-    # print('\033[96m' + X_test.shape+ '\033[0m')
-
+    X_train = train_df_.values
+    y_train = train_labels_df.values
+    X_val = val_df_.values
+    y_val = val_labels_df.values
     if tune:
     
         print('\033[96m' + 'Hyperparameter Tuning...'+ '\033[0m')
@@ -108,11 +110,12 @@ if __name__ == "__main__":
         print('\033[96m' + 'Starting model training...'+ '\033[0m')
         print()
         xgb.fit(X_train,y_train)
-        y_pred = xgb.predict(X_test)
+        y_pred = xgb.predict(X_val)
         print('\033[96m' + 'Predictions :'+ '\033[0m')
-        get_classification_report(y_test,y_pred)
-        get_confusion_matrix(y_test,y_pred)
-        get_scores(y_test,y_pred)
+        get_classification_report(y_val,y_pred)
+        get_confusion_matrix(y_val,y_pred)
+        get_scores(y_val,y_pred)
+        generate_submission_xgboost_track_1(xgb,test_df.values,le)
         save_xgb(xgb)
     
     
