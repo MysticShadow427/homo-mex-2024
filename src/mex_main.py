@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 from mex_preprocess import remove_chars_except_punctuations,remove_newline_pattern,remove_numbers_and_urls,remove_pattern,remove_emojis
 from mex_eval import get_confusion_matrix,get_predictions,get_scores,get_classification_report,generate_submission_track_1
 from mex_augment_data import random_oversample
-from load_lora_llm import MexSpanClassifier
+from load_llm import MexSpanClassifier
 
 
 if __name__ == "__main__":
@@ -32,9 +32,9 @@ if __name__ == "__main__":
     print('\033[96m' + 'Device : ',device + '\033[0m')
     print()
 
-    train_df = pd.read_csv('/content/homo-mex-2024/data/public_data_train_phase/track_1_dev.csv')
+    train_df = pd.read_csv('/content/homo-mex-2024/data/public_data_train_phase/track_1_train.csv')
     val_df = pd.read_csv('/content/homo-mex-2024/data/public_data_dev_phase/track_1_dev.csv')
-    test_df = pd.read_csv('/content/homo-mex-2024/data/public_data_test/track_1_dev.csv')
+    test_df = pd.read_csv('/content/homo-mex-2024/data/public_data_test/track_1_test.csv')
 
     train_df['content'] = train_df['content'].apply(remove_pattern)
     train_df['content'] = train_df['content'].apply(remove_numbers_and_urls)
