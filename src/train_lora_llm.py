@@ -6,12 +6,18 @@ from peft import AutoPeftModelForSequenceClassification
 from datasets import load_dataset
 from torch.utils.data import DataLoader
 from mex_eval import get_confusion_matrix,get_classification_report,get_peft_predictions,get_scores
+from mex_augment_data import random_oversample
+import pandas as pd
 
 peft_model_name = 'bert-base-spanish-wwm-uncased-peft-homo-mex'
 modified_base = 'bert-base-spanish-wwm-uncased-modified-homo-mex'
 base_model = 'dccuchile/bert-base-spanish-wwm-uncased'
 
-dataset = load_dataset("csv", data_files='/content/homo-mex-2024/data/public_data_dev_phase/track_1_dev.csv')
+train_df = pd.read_csv('/content/homo-mex-2024/data/public_data_train_phase/track_1_train.csv')
+train_df = random_oversample(train_df)
+train_df.to_csv('/content/homo-mex-2024/data/public_data_train_phase/track_1_train.csv',index = False)
+train_dataset = load_dataset("csv", data_files='/content/homo-mex-2024/data/public_data_train_phase/track_1_train.csv')
+val_dataset = load_dataset("csv", data_files='/content/homo-mex-2024/data/public_data_dev_phase/track_1_dev.csv')
 tokenizer = AutoTokenizer.from_pretrained(base_model)
 
 num_labels = 3
@@ -26,10 +32,11 @@ def preprocess(examples):
     tokenized = tokenizer(examples['content'], truncation=True, padding=True)
     return tokenized
 
-tokenized_dataset = dataset.map(preprocess, batched=True,  remove_columns=["content"])
-tokenized_dataset = tokenized_dataset['train'].train_test_split(test_size=0.2,seed = 42) #stratify_by_column="label")
-train_dataset=tokenized_dataset['train']
-test_dataset=tokenized_dataset['test']
+tokenized_dataset_train = train_dataset.map(preprocess, batched=True,  remove_columns=["content"])
+tokenized_dataset_val = val_dataset.map(preprocess, batched=True,  remove_columns=["content"])
+# tokenized_dataset_val = tokenized_dataset['train'].train_test_split(test_size=0.2,seed = 42) #stratify_by_column="label")
+train_dataset=tokenized_dataset_train['train']
+test_dataset=tokenized_dataset_val['train']
 print('\033[96m' + 'Datasets ready'+ '\033[0m')
 print()
 
@@ -86,11 +93,6 @@ print()
 y_pred_val, y_pred_probs_val, y_val = get_peft_predictions(inference_model,val_data_loader)
 y_pred_train, y_pred_probs_train, y_train = get_peft_predictions(inference_model,train_data_loader)
 
-# print('Test Data Classification Report : ')
-# print()
-# get_classification_report(y_test,y_pred_test)
-# get_scores(y_test,y_pred_test)
-# get_confusion_matrix(y_test,y_pred_test)
 print('\033[96m' + 'Val Data Classification Report : '+ '\033[0m')
 print()
 get_classification_report(y_val,y_pred_val)
