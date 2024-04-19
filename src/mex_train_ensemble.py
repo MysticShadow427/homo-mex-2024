@@ -174,3 +174,5 @@ if __name__ == "__main__":
     get_classification_report(y_train,y_pred_train)
     get_scores(y_train,y_pred_train)
     get_confusion_matrix(y_train,y_pred_train)
+
+# we need to now change the paths and other stuff according to val data and training data we have gotten and accordingly the augmentations and sentence embeddings we need to generate
