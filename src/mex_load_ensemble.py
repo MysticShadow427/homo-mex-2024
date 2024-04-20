@@ -41,7 +41,7 @@ class MexClassifierEnsemble(nn.Module):
         self.deberta_dropout = nn.Dropout(self.dropout)
 
         self.classifier = nn.Sequential(
-            nn.Linear(in_features=self.hidden_4,out_features=self.hidden_3),
+            # nn.Linear(in_features=self.hidden_4,out_features=self.hidden_3),
             nn.Linear(in_features=self.hidden_3,out_features=self.hidden_5),
             nn.Dropout(self.dropout),
             nn.Linear(in_features=self.hidden_5,out_features=3)
