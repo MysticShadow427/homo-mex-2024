@@ -44,8 +44,8 @@ training_args = TrainingArguments(
     output_dir='./results',
     evaluation_strategy='epoch',
     learning_rate=2e-5,
-    num_train_epochs=15,
-    per_device_train_batch_size=16,
+    num_train_epochs=3,
+    per_device_train_batch_size=32,
 )
 print('\033[96m' + 'Training arguments set.'+ '\033[0m')
 print()
