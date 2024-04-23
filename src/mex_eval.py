@@ -240,11 +240,11 @@ def get_confusion_matrix(y_test, y_pred):
 def get_scores(y_test,y_pred):
     print('Accuracy : ',accuracy_score(y_test,y_pred))
     print()
-    print('Precision : ',precision_score(y_test,y_pred,average='weighted'))
+    print('Precision : ',precision_score(y_test,y_pred,average='macro'))
     print()
-    print('Recall : ',recall_score(y_test,y_pred,average='weighted'))
+    print('Recall : ',recall_score(y_test,y_pred,average='macro'))
     print()
-    print('F-1 : ',f1_score(y_test,y_pred,average='weighted'))
+    print('F-1 : ',f1_score(y_test,y_pred,average='macro'))
 
 def generate_submission_track_1(model, data_loader):
     # we need to write code according to the class names {'NR': 0, 'P': 1, 'NP': 2}
@@ -289,7 +289,7 @@ def generate_submission_xgboost_track_1(model,X_test,le):
     for i, label in enumerate(predictions)
     ]
     df = pd.DataFrame(data, columns=['sub_id', 'label'])
-    df.to_csv('/content/drive/MyDrive/homo_mex_track_1_sub_xgboost.csv',index = False)
+    df.to_csv('/content/drive/MyDrive/homo_mex_track_1_sub_xgboost_macro.csv',index = False)
     print('Submission CSV Generated')
 
 def generate_submission_track_1_ensemble(model,data_loader):
