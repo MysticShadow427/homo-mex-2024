@@ -42,6 +42,37 @@ def get_peft_predictions(model, data_loader):
     real_values = torch.stack(real_values).cpu()
     return predictions, prediction_probs, real_values
 
+def get_peft_predictions_test(model, data_loader):
+    model = model.eval()
+
+    predictions = []
+    prediction_probs = []
+    real_values = []
+
+    with torch.no_grad():
+        for d in data_loader:
+
+            input_ids = d["input_ids"].to(device)
+            attention_mask = d["attention_mask"].to(device)
+            # targets = d["labels"].to(device)
+
+            outputs = model(
+                input_ids=input_ids,
+                attention_mask=attention_mask
+            )
+            _, preds = torch.max(outputs.logits, dim=1)
+
+            probs = F.softmax(outputs.logits, dim=1)
+
+            predictions.extend(preds)
+            prediction_probs.extend(probs)
+            # real_values.extend(targets)
+
+    predictions = torch.stack(predictions).cpu()
+    prediction_probs = torch.stack(prediction_probs).cpu()
+    # real_values = torch.stack(real_values).cpu()
+    return predictions, prediction_probs, real_values
+
 def get_predictions_test(model, data_loader):
     model = model.eval()
 
@@ -274,9 +305,9 @@ def generate_submission_track_3(model, data_loader,class_to_index):
     print('Submission CSV Generated')
     
 
-def generate_submission_lora_track_3(model, data_loader):
-    class_mapping = {'NP': 0, 'P': 1}
-    predictions, prediction_probs, real_values = get_peft_predictions(model, data_loader)
+def generate_submission_lora_track_3(model, data_loader,class_to_index):
+    class_mapping = class_to_index
+    predictions, prediction_probs, real_values = get_peft_predictions_test(model, data_loader)
     data = [('{}_Track3'.format(i), list(class_mapping.keys())[label.item()]) for i, label in enumerate(predictions)]
     df = pd.DataFrame(data, columns=['sub_id', 'label'])
     df.to_csv('/content/drive/MyDrive/homo_mex_track_3_lora_sub.csv',index = False)

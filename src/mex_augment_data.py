@@ -34,7 +34,7 @@ def random_oversample_track_3(df,random_seed = 42):
     class_1_df = df[df['label'] == 'NP']
     class_3_df = df[df['label'] == 'P']
 
-    desired_samples = 560 
+    desired_samples = 945
 
     if len(class_3_df) < desired_samples:
         oversampled_class_3_df = class_3_df.sample(n=desired_samples, replace=True)

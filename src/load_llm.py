@@ -24,3 +24,5 @@ class MexSpanClassifier(nn.Module):
     output = self.drop(pooled_output)
     return self.out(output)
   # https://colab.research.google.com/drive/1FklMjfL6-fMhoPo73BYQ7EvSVYWLykku#scrollTo=IDGwprtLC5cw&uniqifier=1
+  # https://discuss.huggingface.co/t/how-to-freeze-some-layers-of-bertmodel/917
+  # https://discuss.huggingface.co/t/freeze-lower-layers-with-auto-classification-model/11386/7

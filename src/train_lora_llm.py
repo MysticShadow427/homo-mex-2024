@@ -5,23 +5,50 @@ from peft import LoraConfig, get_peft_model
 from peft import AutoPeftModelForSequenceClassification
 from datasets import load_dataset
 from torch.utils.data import DataLoader
-from mex_eval import get_confusion_matrix,get_classification_report,get_peft_predictions,get_scores
-from mex_augment_data import random_oversample
+from mex_eval import generate_submission_lora_track_3,get_confusion_matrix,get_classification_report,get_peft_predictions,get_scores
+from mex_augment_data import random_oversample_track_3
 import pandas as pd
+from mex_preprocess import remove_chars_except_punctuations,remove_newline_pattern,remove_numbers_and_urls,remove_pattern,remove_emojis
 
 peft_model_name = 'bert-base-spanish-wwm-uncased-peft-homo-mex'
 modified_base = 'bert-base-spanish-wwm-uncased-modified-homo-mex'
 base_model = 'dccuchile/bert-base-spanish-wwm-uncased'
 
-train_df = pd.read_csv('/content/homo-mex-2024/data/public_data_train_phase/track_1_train.csv')
-train_df = random_oversample(train_df)
-train_df.to_csv('/content/homo-mex-2024/data/public_data_train_phase/track_1_train.csv',index = False)
-train_dataset = load_dataset("csv", data_files='/content/homo-mex-2024/data/public_data_train_phase/track_1_train.csv')
-val_dataset = load_dataset("csv", data_files='/content/homo-mex-2024/data/public_data_dev_phase/track_1_dev.csv')
+train_df = pd.read_csv('/content/homo-mex-2024/data/public_data_train_phase/track_3_train.csv')
+val_df = pd.read_csv('/content/homo-mex-2024/data/public_data_dev_phase/track_3_dev.csv')
+test_df = pd.read_csv('/content/homo-mex-2024/data/public_data_test/track_3_public_test.csv')
+
+train_df = random_oversample_track_3(train_df)
+train_df.rename(columns={'lyrics': 'content'}, inplace=True)
+val_df.rename(columns={'lyric': 'content'}, inplace=True)
+test_df.rename(columns={'lyrics': 'content'}, inplace=True)
+train_df['content'] = train_df['content'].apply(remove_pattern)
+train_df['content'] = train_df['content'].apply(remove_numbers_and_urls)
+train_df['content'] = train_df['content'].apply(remove_chars_except_punctuations)
+train_df['content'] = train_df['content'].apply(remove_newline_pattern)
+train_df['content'] = train_df['content'].apply(remove_emojis)
+val_df['content'] = val_df['content'].apply(remove_pattern)
+val_df['content'] = val_df['content'].apply(remove_numbers_and_urls)
+val_df['content'] = val_df['content'].apply(remove_chars_except_punctuations)
+val_df['content'] = val_df['content'].apply(remove_newline_pattern)
+val_df['content'] = val_df['content'].apply(remove_emojis)
+test_df['content'] = test_df['content'].apply(remove_pattern)
+test_df['content'] = test_df['content'].apply(remove_numbers_and_urls)
+test_df['content'] = test_df['content'].apply(remove_chars_except_punctuations)
+test_df['content'] = test_df['content'].apply(remove_newline_pattern)
+test_df['content'] = test_df['content'].apply(remove_emojis)
+train_df.to_csv('/content/homo-mex-2024/data/public_data_train_phase/track_3_train.csv',index = False)
+val_df.to_csv('/content/homo-mex-2024/data/public_data_dev_phase/track_3_dev.csv',index = False)
+test_df.to_csv('/content/homo-mex-2024/data/public_data_test/track_3_public_test.csv',index = False)
+
+train_dataset = load_dataset("csv", data_files='/content/homo-mex-2024/data/public_data_train_phase/track_3_train.csv')
+val_dataset = load_dataset("csv", data_files='/content/homo-mex-2024/data/public_data_dev_phase/track_3_dev.csv')
+test_dataset = load_dataset("csv", data_files='/content/homo-mex-2024/data/public_data_test/track_3_public_test.csv')
 tokenizer = AutoTokenizer.from_pretrained(base_model)
 
-num_labels = 3
-class_names = ['NP','NR','P']
+
+num_labels = 2
+class_names = ['NP','P']
 
 id2label = {i: label for i, label in enumerate(class_names)}
 label2id = {label: i for i,label in enumerate(class_names)}
@@ -32,11 +59,19 @@ def preprocess(examples):
     tokenized = tokenizer(examples['content'], truncation=True, padding=True)
     return tokenized
 
+def preprocess_test(examples):
+    # examples["label"] = [label2id[label] for label in examples["label"]]
+    tokenized = tokenizer(examples['content'], truncation=True, padding=True)
+    return tokenized
+
 tokenized_dataset_train = train_dataset.map(preprocess, batched=True,  remove_columns=["content"])
 tokenized_dataset_val = val_dataset.map(preprocess, batched=True,  remove_columns=["content"])
+tokenized_dataset_test = test_dataset.map(preprocess_test, batched=True,  remove_columns=["content"])
+
 # tokenized_dataset_val = tokenized_dataset['train'].train_test_split(test_size=0.2,seed = 42) #stratify_by_column="label")
 train_dataset=tokenized_dataset_train['train']
-test_dataset=tokenized_dataset_val['train']
+val_dataset=tokenized_dataset_val['train']
+test_dataset = tokenized_dataset_test['train']
 print('\033[96m' + 'Datasets ready'+ '\033[0m')
 print()
 
@@ -85,8 +120,10 @@ tokenizer = AutoTokenizer.from_pretrained(modified_base)
 print('\033[96m' + 'Loaded Trained Model for inference'+ '\033[0m')
 print()
 
-val_data_loader = DataLoader(test_dataset, batch_size=16, collate_fn=data_collator)
+val_data_loader = DataLoader(val_dataset, batch_size=16, collate_fn=data_collator)
 train_data_loader = DataLoader(train_dataset, batch_size=16, collate_fn=data_collator)
+test_data_loader = DataLoader(test_dataset, batch_size=16, collate_fn=data_collator)
+
 print('\033[96m' + 'Getting Predictions...'+ '\033[0m')
 print()
 # y_review_texts_test, y_pred_test, y_pred_probs_test, y_test = get_predictions(model,test_data_loader)
@@ -103,3 +140,4 @@ print()
 get_classification_report(y_train,y_pred_train)
 get_scores(y_train,y_pred_train)
 get_confusion_matrix(y_train,y_pred_train)
+generate_submission_lora_track_3(inference_model,test_data_loader,label2id)
