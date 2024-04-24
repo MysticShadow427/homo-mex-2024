@@ -12,8 +12,8 @@ import numpy as np
 import csv
 from sklearn.model_selection import train_test_split
 from mex_preprocess import remove_chars_except_punctuations,remove_newline_pattern,remove_numbers_and_urls,remove_pattern,remove_emojis
-from mex_eval import get_confusion_matrix,get_predictions,get_scores,get_classification_report,generate_submission_track_1
-from mex_augment_data import random_oversample
+from mex_eval import get_confusion_matrix,get_predictions,get_scores,get_classification_report,generate_submission_track_3
+from mex_augment_data import random_oversample_track_3
 from load_llm import MexSpanClassifier
 
 
@@ -35,13 +35,15 @@ if __name__ == "__main__":
     train_df = pd.read_csv('/content/homo-mex-2024/data/public_data_train_phase/track_1_train.csv')
     val_df = pd.read_csv('/content/homo-mex-2024/data/public_data_dev_phase/track_1_dev.csv')
     test_df = pd.read_csv('/content/homo-mex-2024/data/public_data_test/track_1_public_test.csv')
-
+    # train_df.rename(columns={'lyrics': 'content'}, inplace=True)
+    # val_df.rename(columns={'lyric': 'content'}, inplace=True)
+    # test_df.rename(columns={'lyrics': 'content'}, inplace=True)
     train_df['content'] = train_df['content'].apply(remove_pattern)
     train_df['content'] = train_df['content'].apply(remove_numbers_and_urls)
     train_df['content'] = train_df['content'].apply(remove_chars_except_punctuations)
     train_df['content'] = train_df['content'].apply(remove_newline_pattern)
     train_df['content'] = train_df['content'].apply(remove_emojis)
-    train_df = random_oversample(train_df)
+    train_df = random_oversample_track_3(train_df)
 
     val_df['content'] = val_df['content'].apply(remove_pattern)
     val_df['content'] = val_df['content'].apply(remove_numbers_and_urls)
@@ -86,7 +88,7 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained(checkpoint)
     print('\033[96m' + 'Tokenizer Loaded'+ '\033[0m')
     print()
-    model = MexSpanClassifier(n_classes=3).to(device)
+    model = MexSpanClassifier(n_classes=2).to(device)
     print('\033[96m' + 'Model Spanish BERT Loaded'+ '\033[0m')
     print()
 
@@ -179,7 +181,7 @@ if __name__ == "__main__":
     get_classification_report(y_train,y_pred_train)
     get_scores(y_train,y_pred_train)
     get_confusion_matrix(y_train,y_pred_train)
-    generate_submission_track_1(model,test_data_loader)
+    generate_submission_track_3(model,test_data_loader,class_to_index)
     
 
 
