@@ -1,5 +1,5 @@
 # homo-mex-2024
-**You can run the code either on Local Machine with a GPU or *Google Colab/Kaggle Environment* by cloning the repo and running the commands on the terminal or best way is to follow the commands given in `mex_main.py`,`mex_train_lstm.py` and `mex_train_xgboost.py.`**
+**You can run the code either on Local Machine with a GPU or *Google Colab/Kaggle Environment* by cloning the repo and running the commands on the terminal or best way is to follow the commands given in `homo-mex-2024-main.ipynb` to run `mex_main.py`,`mex_train_lstm.py`, `mex_train_lstm.py`, `mex_train_ensemble.py` and `mex_train_xgboost.py.`**
 
 <hr>
 
@@ -59,10 +59,10 @@
     7. `hidden_size` : A integer value for dimensionality of the LSTM hidden space.
 <hr>
 
-*I think the best way to run the scripts is on Google Colab,host your data their and just run the `homo-mex-2024-main.ipynb`.*
-<hr>
-<details>
+<!-- *I think the best way to run the scripts is on Google Colab,host your data their and just run the `homo-mex-2024-main.ipynb`.*
+<hr> -->
+<!-- <details>
   <summary>Next approaches planned</summary>
   - Using features from Spanish BERT and instead of directly applying a softmax layer we can train a another LSTM or Transformer.
   - Use contrastive losses to enhance the feature representations and then using some classifiers on top of it.
-</details>
+</details> -->
