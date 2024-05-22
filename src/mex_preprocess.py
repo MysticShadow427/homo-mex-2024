@@ -60,7 +60,3 @@ def get_sentence_embeddings():
     embeddings_df = pd.DataFrame(embeddings,columns = [f"feat_{i+1}" for i in range(embeddings.shape[1])])
     embeddings_df['label'] = df['label']
     return embeddings_df
-
-# # now we will do 2 things - 
-#     1.first on raw oversampled text data we will do the prasanna sir mehtod
-#     2. second we will do smote on the embeddings and then so smote on that 
