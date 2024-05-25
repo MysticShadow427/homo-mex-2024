@@ -50,7 +50,7 @@ class CapsuleLayer(torch.nn.Module):
         return scale * s
 
 class CapsNet(torch.nn.Module):
-    def __init__(self, num_capsules, num_routes, in_dim, out_dim, num_iterations=3):
+    def __init__(self, num_capsules, num_routes, in_dim, out_dim, num_iterations):
         super(CapsNet, self).__init__()
         self.capsule_layer = CapsuleLayer(num_capsules, num_routes, in_dim, out_dim, num_iterations)
         self.W_lambda = torch.nn.Parameter(torch.randn(out_dim, out_dim))  # Adjusted size for concatenation
@@ -80,4 +80,4 @@ class CapsNet(torch.nn.Module):
 # ui = torch.randn(batch_size, num_time_steps, hidden_dim)
 # capsnet = CapsNet(num_capsules, num_routes, hidden_dim, out_dim, num_iterations)
 # output = capsnet(ui)
-# print(output.shape)  # Should print (batch_size, out_dim)
+# print(output.shape)  #  (batch_size, out_dim)

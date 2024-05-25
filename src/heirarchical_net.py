@@ -5,22 +5,16 @@ import torch.nn as nn
 import sys
 import csv
 csv.field_size_limit(sys.maxsize)
-from nltk.tokenize import sent_tokenize, word_tokenize
-from sklearn import metrics
-import numpy as np
-import pandas as pd
 import torch.nn.functional as F
 
 
 class HierAttNet(nn.Module):
-    def __init__(self, word_hidden_size, sent_hidden_size, batch_size,
-                 max_sent_length, max_word_length):
+    def __init__(self, word_hidden_size, sent_hidden_size, batch_size):
         super(HierAttNet, self).__init__()
         self.batch_size = batch_size
         self.word_hidden_size = word_hidden_size
         self.sent_hidden_size = sent_hidden_size
-        self.max_sent_length = max_sent_length
-        self.max_word_length = max_word_length
+        self.max_sent_length = 100
         self.word_att_net = WordAttNet()
         self.sent_att_net = SentAttNet(sent_hidden_size)
         self._init_hidden_state()
@@ -50,7 +44,7 @@ class HierAttNet(nn.Module):
 
 
 class SentAttNet(nn.Module):
-    def __init__(self, sent_hidden_size=50):
+    def __init__(self, sent_hidden_size):
         super(SentAttNet, self).__init__()
 
         self.sent_weight = nn.Parameter(torch.Tensor(2 * sent_hidden_size, 2 * sent_hidden_size))
