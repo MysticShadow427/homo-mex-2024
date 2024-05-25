@@ -5,7 +5,7 @@ from capsule_net import CapsNet
 from heirarchical_net import HierAttNet
 
 class HCN(nn.Module):
-    def __init__(self,batch_size,train_bone = False,num_capsules=8,num_routing_iterations = 3, num_route_nodes=6,hidden_size = 384,num_classes = 3,dropout = 0.3,word_hidden_size=768, sent_hidden_size=768,in_channels=768, out_channels=768):
+    def __init__(self,batch_size,num_classes = 3,train_bone = False,num_capsules=8,num_routing_iterations = 3, num_route_nodes=6,hidden_size = 384,dropout = 0.3,word_hidden_size=768, sent_hidden_size=768,in_channels=768, out_channels=768):
         super().__init__()
         self.hidden_size = hidden_size
         self.num_classes = num_classes
